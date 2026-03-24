@@ -388,6 +388,18 @@
       background:linear-gradient(180deg,#fff,#fffaf0);
       margin-bottom:10px;
     }
+
+    .status-dot {
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      flex:0 0 auto;
+      margin-top:3px;
+    }
+
+    .status-dot.ok { background:var(--ok); }
+    .status-dot.warn { background:var(--warn); }
+    .status-dot.danger { background:var(--danger); }
   </style>
 </head>
 <body>
@@ -420,31 +432,19 @@
       <div class="section-title">תמונת מצב</div>
       <div class="grid">
         <div class="card kpi">
-          <div class="label">סה״כ רשומות</div>
-          <div class="value" id="kpi-total">0</div>
-          <div class="hint">בעלים / יורשים</div>
-        </div>
-
-        <div class="card kpi">
           <div class="label">סה״כ יחידות במתחם</div>
           <div class="value" id="kpi-buildings">123</div>
           <div class="hint">לפי הספירה שסוכמה</div>
         </div>
 
         <div class="card kpi">
-          <div class="label">יחידות חתומות מלא</div>
-          <div class="value" id="kpi-signed">0</div>
-          <div class="hint">100% חתימות בבניין</div>
-        </div>
-
-        <div class="card kpi">
           <div class="label">אחוז חתימה מכלל המתחם</div>
           <div class="value" id="kpi-signature-rate">0%</div>
-          <div class="hint">מתוך 123 יחידות</div>
+          <div class="hint">סך החתימות אל מול 123 דירות</div>
         </div>
       </div>
 
-      <div class="section-title">מצג בניינים גרפי</div>
+      <div class="section-title">מצב בניינים גרפי</div>
       <div class="card" id="buildings-progress"></div>
 
       <div class="section-title">תובנות מיידיות</div>
@@ -676,8 +676,6 @@
             status = "ok";
           } else if (pct > 50) {
             status = "warn";
-          } else {
-            status = "danger";
           }
 
           return {
@@ -700,16 +698,19 @@
       return getBuildingStats().filter(b => b.street === street);
     }
 
-    function signedPct() {
-      const buildings = getBuildingStats();
-      const fullySignedBuildings = buildings.filter(b => b.pct === 100).length;
+    function totalSignaturesCount() {
+      return apartments.filter(hasSignatureMarker).length;
+    }
+
+    function overallSignaturePct() {
+      const signedRows = totalSignaturesCount();
       return TOTAL_UNITS_IN_COMPLEX
-        ? Math.round((fullySignedBuildings / TOTAL_UNITS_IN_COMPLEX) * 100)
+        ? Math.round((signedRows / TOTAL_UNITS_IN_COMPLEX) * 100)
         : 0;
     }
 
     function applyFilter(item) {
-      if (currentFilter === "signed") return !!item.building && hasSignatureMarker(item);
+      if (currentFilter === "signed") return hasSignatureMarker(item);
       const txt = `${item.interest || ""} ${item.notes || ""}`;
       if (currentFilter === "opponents") return txt.includes("מתנגד") || txt.includes("לא מעונ");
       if (currentFilter === "missingPhone") return !item.phone;
@@ -733,60 +734,44 @@
     }
 
     function fillKPIs() {
-      const buildings = getBuildingStats();
-      const fullySignedBuildings = buildings.filter(b => b.pct === 100).length;
-      const percent = TOTAL_UNITS_IN_COMPLEX
-        ? Math.round((fullySignedBuildings / TOTAL_UNITS_IN_COMPLEX) * 100)
-        : 0;
-
-      document.getElementById("kpi-total").textContent = apartments.length;
       document.getElementById("kpi-buildings").textContent = TOTAL_UNITS_IN_COMPLEX;
-      document.getElementById("kpi-signed").textContent = fullySignedBuildings;
-      document.getElementById("kpi-signature-rate").textContent = percent + "%";
+      document.getElementById("kpi-signature-rate").textContent = overallSignaturePct() + "%";
     }
 
     function renderQuickInsights() {
       const buildings = getBuildingStats();
-      const fullySignedBuildings = buildings.filter(b => b.pct === 100).length;
-      const partialAbove50 = buildings.filter(b => b.pct > 50 && b.pct < 100).length;
-      const partialBelow50 = buildings.filter(b => b.pct <= 50).length;
+      const greenBuildings = buildings.filter(b => b.status === "ok").length;
+      const orangeBuildings = buildings.filter(b => b.status === "warn").length;
+      const redBuildings = buildings.filter(b => b.status === "danger").length;
       const missingPhone = apartments.filter(a => !a.phone).length;
       const noNotes = apartments.filter(a => !(a.notes || "").trim()).length;
-      const percent = TOTAL_UNITS_IN_COMPLEX
-        ? Math.round((fullySignedBuildings / TOTAL_UNITS_IN_COMPLEX) * 100)
-        : 0;
+      const totalSignedRows = totalSignaturesCount();
 
       document.getElementById("quick-insights").innerHTML = `
         <div class="card insight">
           <span class="dot" style="background:#7fb18a"></span>
-          <div>יש כרגע <b>${fullySignedBuildings}</b> בניינים חתומים מלא, שהם <b>${percent}%</b> מכלל המתחם.</div>
+          <div>יש כרגע <b>${totalSignedRows}</b> חתימות מתוך 123 דירות, שהם <b>${overallSignaturePct()}%</b> מכלל המתחם.</div>
         </div>
 
         <div class="card insight">
-          <span class="dot" style="background:#f0a95b"></span>
-          <div>יש <b>${partialAbove50}</b> בניינים בחתימה חלקית מעל 50%.</div>
+          <span class="dot" style="background:#7fb18a"></span>
+          <div><b>${greenBuildings}</b> בניינים בירוק, <b>${orangeBuildings}</b> בכתום, <b>${redBuildings}</b> באדום.</div>
         </div>
 
         <div class="card insight">
           <span class="dot" style="background:#e67b73"></span>
-          <div>יש <b>${partialBelow50}</b> בניינים בחתימה חלקית מתחת ל־50% או ללא חתימה.</div>
+          <div>יש <b>${missingPhone}</b> רשומות ללא טלפון.</div>
         </div>
 
         <div class="card insight">
           <span class="dot" style="background:#f0a95b"></span>
-          <div>יש <b>${missingPhone}</b> רשומות ללא טלפון ו־<b>${noNotes}</b> רשומות ללא הערה.</div>
+          <div>יש <b>${noNotes}</b> רשומות ללא הערה.</div>
         </div>
       `;
     }
 
-    function buildingStatusTag(b) {
-      if (b.pct === 100) {
-        return `<span class="tag ok">חתום מלא</span>`;
-      }
-      if (b.pct > 50) {
-        return `<span class="tag warn">חתום חלקית</span>`;
-      }
-      return `<span class="tag danger">חתום חלקית / לא חתום</span>`;
+    function buildingDotClass(b) {
+      return b.status === "ok" ? "ok" : b.status === "warn" ? "warn" : "danger";
     }
 
     function renderBuildingProgress() {
@@ -802,13 +787,12 @@
               ${
                 rows.map(b => `
                   <div class="card building-tile" onclick="openBuilding('${street}','${String(b.building).replace(/'/g, "&#39;")}')">
-                    <div class="owner">בניין ${b.building}</div>
-                    <div class="meta">${b.signedCount} חתימות מתוך ${b.total} · ${b.pct}%</div>
-                    <div class="bar" style="margin:10px 0 8px;"><span style="width:${b.pct}%"></span></div>
                     <div class="topline">
-                      <span class="small">סטטוס</span>
-                      ${buildingStatusTag(b)}
+                      <div class="owner">בניין ${b.building}</div>
+                      <span class="status-dot ${buildingDotClass(b)}"></span>
                     </div>
+                    <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
+                    <div class="bar" style="margin:10px 0 8px;"><span style="width:${b.pct}%"></span></div>
                   </div>
                 `).join("") || `<div class="card">אין נתונים ל-${street}</div>`
               }
@@ -934,9 +918,9 @@
                     <div class="topline">
                       <div>
                         <div class="owner">בניין ${b.building}</div>
-                        <div class="meta">${b.signedCount} חתימות מתוך ${b.total} · ${b.pct}%</div>
+                        <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
                       </div>
-                      ${buildingStatusTag(b)}
+                      <span class="status-dot ${buildingDotClass(b)}"></span>
                     </div>
                     <div class="bar" style="margin-top:10px;"><span style="width:${b.pct}%"></span></div>
                   </div>
@@ -967,9 +951,9 @@
             <div class="topline">
               <div>
                 <div class="owner">בניין ${b.building}</div>
-                <div class="meta">${b.signedCount} חתימות מתוך ${b.total} · ${b.pct}%</div>
+                <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
               </div>
-              ${buildingStatusTag(b)}
+              <span class="status-dot ${buildingDotClass(b)}"></span>
             </div>
             <div class="bar" style="margin-top:10px;"><span style="width:${b.pct}%"></span></div>
           </div>
@@ -988,29 +972,25 @@
     function renderInsights() {
       const box = document.getElementById("insights-content");
       const buildings = getBuildingStats();
-      const fullySignedBuildings = buildings.filter(b => b.pct === 100).length;
-      const projectPct = TOTAL_UNITS_IN_COMPLEX
-        ? Math.round((fullySignedBuildings / TOTAL_UNITS_IN_COMPLEX) * 100)
-        : 0;
-
+      const totalSignedRows = totalSignaturesCount();
+      const projectPct = overallSignaturePct();
       const weakBuildings = buildings.filter(b => b.pct < 100 || b.missing > 0 || b.opp > 0);
 
       box.innerHTML = `
         <div class="card" style="margin-bottom:12px;">
           <div class="owner">רמת פרויקט</div>
-          <div class="meta" style="margin-top:8px;">אחוז חתימה מלא מכלל המתחם: <b>${projectPct}%</b></div>
-          <div class="meta">בניינים חתומים מלא: <b>${fullySignedBuildings}</b></div>
+          <div class="meta" style="margin-top:8px;">אחוז חתימה מכלל המתחם: <b>${projectPct}%</b></div>
+          <div class="meta">סך חתימות בפועל: <b>${totalSignedRows}</b></div>
           <div class="meta">סה״כ יחידות במתחם: <b>${TOTAL_UNITS_IN_COMPLEX}</b></div>
         </div>
 
         ${["ניקנור", "חננאל"].map(street => {
           const rows = getStreetBuildingStats(street);
-          const fullySignedInStreet = rows.filter(r => r.pct === 100).length;
           return `
             <div class="card" style="margin-bottom:12px;">
               <div class="owner">${street}</div>
-              <div class="meta" style="margin-top:8px;">בניינים חתומים מלא ברחוב: <b>${fullySignedInStreet}</b></div>
-              <div class="meta">בניינים מזוהים ברחוב: <b>${rows.length}</b></div>
+              <div class="meta" style="margin-top:8px;">בניינים מזוהים ברחוב: <b>${rows.length}</b></div>
+              <div class="meta">ממוצע חתימה ברחוב: <b>${rows.length ? Math.round(rows.reduce((s, r) => s + r.pct, 0) / rows.length) : 0}%</b></div>
             </div>
           `;
         }).join("")}
@@ -1022,9 +1002,9 @@
               <div class="topline">
                 <div>
                   <div class="owner">${b.street} · בניין ${b.building}</div>
-                  <div class="meta">${b.signedCount} חתימות מתוך ${b.total} · ${b.pct}%</div>
+                  <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
                 </div>
-                ${buildingStatusTag(b)}
+                <span class="status-dot ${buildingDotClass(b)}"></span>
               </div>
               <div class="note" style="margin-top:8px;">
                 ${b.pct < 100 ? "הבניין עדיין לא חתום מלא. " : ""}
