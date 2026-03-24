@@ -386,6 +386,7 @@
       gap:10px;
       align-items:flex-start;
       background:linear-gradient(180deg,#fff,#fffaf0);
+      margin-bottom:10px;
     }
   </style>
 </head>
@@ -425,21 +426,21 @@
         </div>
 
         <div class="card kpi">
-          <div class="label">סה״כ בניינים</div>
+          <div class="label">סה״כ יחידות במתחם</div>
           <div class="value" id="kpi-buildings">123</div>
-          <div class="hint">לפי מספר בניין</div>
+          <div class="hint">לפי הספירה שסוכמה</div>
         </div>
 
         <div class="card kpi">
-          <div class="label">בניינים חתומים</div>
+          <div class="label">יחידות חתומות מלא</div>
           <div class="value" id="kpi-signed">0</div>
-          <div class="hint">לפחות סימון חתימה אחד</div>
+          <div class="hint">100% חתימות בבניין</div>
         </div>
 
         <div class="card kpi">
-          <div class="label">אחוז חתימה כללי</div>
+          <div class="label">אחוז חתימה מכלל המתחם</div>
           <div class="value" id="kpi-signature-rate">0%</div>
-          <div class="hint">לפי בניינים</div>
+          <div class="hint">מתוך 123 יחידות</div>
         </div>
       </div>
 
@@ -464,7 +465,7 @@
 
       <div class="chips">
         <button class="chip active" data-filter="all" onclick="setFilter('all', event)">הכל</button>
-        <button class="chip" data-filter="signed" onclick="setFilter('signed', event)">בבניינים חתומים</button>
+        <button class="chip" data-filter="signed" onclick="setFilter('signed', event)">חתומים</button>
         <button class="chip" data-filter="opponents" onclick="setFilter('opponents', event)">מתנגדים</button>
         <button class="chip" data-filter="missingPhone" onclick="setFilter('missingPhone', event)">חסרי טלפון</button>
       </div>
@@ -518,6 +519,7 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzWmJ16e1PEaYCsh_A6iQoC8fxFU_LGApJRzlLMPnkzPR-cZmmRUCT5cgZHOWxt3PP1/exec";
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing";
+    const TOTAL_UNITS_IN_COMPLEX = 123;
 
     let apartments = [];
     let fallbackRows = [];
@@ -639,35 +641,59 @@
 
     function getBuildingStats() {
       const groups = {};
+
       apartments.forEach(item => {
         const street = normalizedStreet(item);
         const building = String(item.building || "").trim();
         if (!building) return;
+
         const key = street + "|" + building;
-        if (!groups[key]) groups[key] = { street, building, items: [] };
+        if (!groups[key]) {
+          groups[key] = {
+            street,
+            building,
+            items: []
+          };
+        }
+
         groups[key].items.push(item);
       });
 
       return Object.values(groups)
         .map(g => {
           const total = g.items.length;
-          const signed = g.items.some(hasSignatureMarker) ? 1 : 0;
+          const signedCount = g.items.filter(hasSignatureMarker).length;
           const missing = g.items.filter(i => !i.phone).length;
           const opp = g.items.filter(i => {
             const txt = `${i.interest || ""} ${i.notes || ""}`;
             return txt.includes("מתנגד") || txt.includes("לא מעונ");
           }).length;
 
+          const pct = total ? Math.round((signedCount / total) * 100) : 0;
+
+          let status = "danger";
+          if (pct === 100) {
+            status = "ok";
+          } else if (pct > 50) {
+            status = "warn";
+          } else {
+            status = "danger";
+          }
+
           return {
             ...g,
             total,
-            signed,
+            signedCount,
             missing,
             opp,
-            pct: signed ? 100 : 0
+            pct,
+            status
           };
         })
-        .sort((a, b) => a.street.localeCompare(b.street, "he") || (Number(a.building) || 999) - (Number(b.building) || 999));
+        .sort((a, b) =>
+          a.street.localeCompare(b.street, "he") ||
+          (Number(a.building) || 999) - (Number(b.building) || 999)
+        );
     }
 
     function getStreetBuildingStats(street) {
@@ -676,7 +702,10 @@
 
     function signedPct() {
       const buildings = getBuildingStats();
-      return buildings.length ? Math.round((buildings.filter(b => b.signed > 0).length / buildings.length) * 100) : 0;
+      const fullySignedBuildings = buildings.filter(b => b.pct === 100).length;
+      return TOTAL_UNITS_IN_COMPLEX
+        ? Math.round((fullySignedBuildings / TOTAL_UNITS_IN_COMPLEX) * 100)
+        : 0;
     }
 
     function applyFilter(item) {
@@ -705,47 +734,59 @@
 
     function fillKPIs() {
       const buildings = getBuildingStats();
-      const totalBuildings = buildings.length;
-      const signedBuildings = buildings.filter(b => b.signed > 0).length;
-      const percent = totalBuildings ? Math.round((signedBuildings / totalBuildings) * 100) : 0;
+      const fullySignedBuildings = buildings.filter(b => b.pct === 100).length;
+      const percent = TOTAL_UNITS_IN_COMPLEX
+        ? Math.round((fullySignedBuildings / TOTAL_UNITS_IN_COMPLEX) * 100)
+        : 0;
 
       document.getElementById("kpi-total").textContent = apartments.length;
-      document.getElementById("kpi-buildings").textContent = totalBuildings;
-      document.getElementById("kpi-signed").textContent = signedBuildings;
+      document.getElementById("kpi-buildings").textContent = TOTAL_UNITS_IN_COMPLEX;
+      document.getElementById("kpi-signed").textContent = fullySignedBuildings;
       document.getElementById("kpi-signature-rate").textContent = percent + "%";
     }
 
     function renderQuickInsights() {
       const buildings = getBuildingStats();
-      const signedBuildings = buildings.filter(b => b.signed > 0).length;
+      const fullySignedBuildings = buildings.filter(b => b.pct === 100).length;
+      const partialAbove50 = buildings.filter(b => b.pct > 50 && b.pct < 100).length;
+      const partialBelow50 = buildings.filter(b => b.pct <= 50).length;
       const missingPhone = apartments.filter(a => !a.phone).length;
       const noNotes = apartments.filter(a => !(a.notes || "").trim()).length;
-      const unsignedBuildings = buildings.filter(b => b.signed === 0).length;
+      const percent = TOTAL_UNITS_IN_COMPLEX
+        ? Math.round((fullySignedBuildings / TOTAL_UNITS_IN_COMPLEX) * 100)
+        : 0;
 
       document.getElementById("quick-insights").innerHTML = `
-        <div class="card insight" style="margin-bottom:10px;">
+        <div class="card insight">
           <span class="dot" style="background:#7fb18a"></span>
-          <div>יש כרגע <b>${signedBuildings}</b> בניינים חתומים.</div>
+          <div>יש כרגע <b>${fullySignedBuildings}</b> בניינים חתומים מלא, שהם <b>${percent}%</b> מכלל המתחם.</div>
         </div>
-        <div class="card insight" style="margin-bottom:10px;">
-          <span class="dot" style="background:#f0a95b"></span>
-          <div>יש <b>${missingPhone}</b> רשומות ללא טלפון.</div>
-        </div>
-        <div class="card insight" style="margin-bottom:10px;">
-          <span class="dot" style="background:#e67b73"></span>
-          <div>יש <b>${unsignedBuildings}</b> בניינים שעדיין לא מסומנים כחתומים.</div>
-        </div>
+
         <div class="card insight">
           <span class="dot" style="background:#f0a95b"></span>
-          <div>יש <b>${noNotes}</b> רשומות ללא הערה.</div>
+          <div>יש <b>${partialAbove50}</b> בניינים בחתימה חלקית מעל 50%.</div>
+        </div>
+
+        <div class="card insight">
+          <span class="dot" style="background:#e67b73"></span>
+          <div>יש <b>${partialBelow50}</b> בניינים בחתימה חלקית מתחת ל־50% או ללא חתימה.</div>
+        </div>
+
+        <div class="card insight">
+          <span class="dot" style="background:#f0a95b"></span>
+          <div>יש <b>${missingPhone}</b> רשומות ללא טלפון ו־<b>${noNotes}</b> רשומות ללא הערה.</div>
         </div>
       `;
     }
 
     function buildingStatusTag(b) {
-      return b.signed
-        ? `<span class="tag ok">חתום</span>`
-        : `<span class="tag warn">לא חתום</span>`;
+      if (b.pct === 100) {
+        return `<span class="tag ok">חתום מלא</span>`;
+      }
+      if (b.pct > 50) {
+        return `<span class="tag warn">חתום חלקית</span>`;
+      }
+      return `<span class="tag danger">חתום חלקית / לא חתום</span>`;
     }
 
     function renderBuildingProgress() {
@@ -762,7 +803,7 @@
                 rows.map(b => `
                   <div class="card building-tile" onclick="openBuilding('${street}','${String(b.building).replace(/'/g, "&#39;")}')">
                     <div class="owner">בניין ${b.building}</div>
-                    <div class="meta">${b.total} רשומות · ${b.missing} בלי טלפון</div>
+                    <div class="meta">${b.signedCount} חתימות מתוך ${b.total} · ${b.pct}%</div>
                     <div class="bar" style="margin:10px 0 8px;"><span style="width:${b.pct}%"></span></div>
                     <div class="topline">
                       <span class="small">סטטוס</span>
@@ -784,7 +825,7 @@
                 <div class="small" style="margin:6px 0 10px;">רשימת גלילה מהירה</div>
                 <select onchange="if(this.value) openBuilding('${street}', this.value)">
                   <option value="">בחר בניין</option>
-                  ${rows.map(b => `<option value="${b.building}">בניין ${b.building} · ${b.signed ? "חתום" : "לא חתום"}</option>`).join("")}
+                  ${rows.map(b => `<option value="${b.building}">בניין ${b.building} · ${b.pct}%</option>`).join("")}
                 </select>
               </div>
             `;
@@ -832,7 +873,7 @@
 
           <div class="tags">
             ${item.phone ? '<span class="tag info">יש טלפון</span>' : '<span class="tag danger">חסר טלפון</span>'}
-            ${hasSignatureMarker(item) ? '<span class="tag ok">בניין חתום</span>' : '<span class="tag warn">בניין לא חתום</span>'}
+            ${hasSignatureMarker(item) ? '<span class="tag ok">רשומה חתומה</span>' : '<span class="tag warn">רשומה לא חתומה</span>'}
           </div>
 
           <div class="detail-grid" style="margin-top:12px;">
@@ -893,7 +934,7 @@
                     <div class="topline">
                       <div>
                         <div class="owner">בניין ${b.building}</div>
-                        <div class="meta">${b.total} רשומות · ${b.missing} בלי טלפון</div>
+                        <div class="meta">${b.signedCount} חתימות מתוך ${b.total} · ${b.pct}%</div>
                       </div>
                       ${buildingStatusTag(b)}
                     </div>
@@ -910,6 +951,7 @@
       if (currentStreet) {
         filtered = filtered.filter(a => normalizedStreet(a) === currentStreet);
       }
+
       if (currentBuilding) {
         filtered = filtered.filter(a => String(a.building || "") === String(currentBuilding));
       }
@@ -925,7 +967,7 @@
             <div class="topline">
               <div>
                 <div class="owner">בניין ${b.building}</div>
-                <div class="meta">${b.total} רשומות · ${b.missing} בלי טלפון · ${b.opp} מתנגדים</div>
+                <div class="meta">${b.signedCount} חתימות מתוך ${b.total} · ${b.pct}%</div>
               </div>
               ${buildingStatusTag(b)}
             </div>
@@ -946,26 +988,29 @@
     function renderInsights() {
       const box = document.getElementById("insights-content");
       const buildings = getBuildingStats();
-      const projectSigned = signedPct();
-      const weakBuildings = buildings.filter(b => b.signed === 0 || b.missing > 0 || b.opp > 0);
+      const fullySignedBuildings = buildings.filter(b => b.pct === 100).length;
+      const projectPct = TOTAL_UNITS_IN_COMPLEX
+        ? Math.round((fullySignedBuildings / TOTAL_UNITS_IN_COMPLEX) * 100)
+        : 0;
+
+      const weakBuildings = buildings.filter(b => b.pct < 100 || b.missing > 0 || b.opp > 0);
 
       box.innerHTML = `
         <div class="card" style="margin-bottom:12px;">
           <div class="owner">רמת פרויקט</div>
-          <div class="meta" style="margin-top:8px;">אחוז בניינים חתומים כללי: <b>${projectSigned}%</b></div>
-          <div class="meta">סה״כ בניינים: <b>${buildings.length}</b></div>
-          <div class="meta">בניינים חתומים: <b>${buildings.filter(b => b.signed > 0).length}</b></div>
+          <div class="meta" style="margin-top:8px;">אחוז חתימה מלא מכלל המתחם: <b>${projectPct}%</b></div>
+          <div class="meta">בניינים חתומים מלא: <b>${fullySignedBuildings}</b></div>
+          <div class="meta">סה״כ יחידות במתחם: <b>${TOTAL_UNITS_IN_COMPLEX}</b></div>
         </div>
 
         ${["ניקנור", "חננאל"].map(street => {
           const rows = getStreetBuildingStats(street);
-          const signedBuildings = rows.filter(r => r.signed > 0).length;
-          const pct = rows.length ? Math.round((signedBuildings / rows.length) * 100) : 0;
+          const fullySignedInStreet = rows.filter(r => r.pct === 100).length;
           return `
             <div class="card" style="margin-bottom:12px;">
               <div class="owner">${street}</div>
-              <div class="meta" style="margin-top:8px;">אחוז בניינים חתומים ברחוב: <b>${pct}%</b></div>
-              <div class="meta">בניינים ברחוב: <b>${rows.length}</b></div>
+              <div class="meta" style="margin-top:8px;">בניינים חתומים מלא ברחוב: <b>${fullySignedInStreet}</b></div>
+              <div class="meta">בניינים מזוהים ברחוב: <b>${rows.length}</b></div>
             </div>
           `;
         }).join("")}
@@ -977,12 +1022,12 @@
               <div class="topline">
                 <div>
                   <div class="owner">${b.street} · בניין ${b.building}</div>
-                  <div class="meta">${b.total} רשומות</div>
+                  <div class="meta">${b.signedCount} חתימות מתוך ${b.total} · ${b.pct}%</div>
                 </div>
                 ${buildingStatusTag(b)}
               </div>
               <div class="note" style="margin-top:8px;">
-                ${b.signed === 0 ? "הבניין עדיין לא חתום. " : ""}
+                ${b.pct < 100 ? "הבניין עדיין לא חתום מלא. " : ""}
                 ${b.missing > 0 ? `יש ${b.missing} רשומות ללא טלפון. ` : ""}
                 ${b.opp > 0 ? `יש ${b.opp} מוקדי התנגדות או אי-עניין. ` : ""}
               </div>
@@ -1034,8 +1079,7 @@
 
     async function loadFallbackData() {
       try {
-        const fallbackUrl = API_URL;
-        const res = await fetch(fallbackUrl, { cache: "no-store" });
+        const res = await fetch(API_URL, { cache: "no-store" });
         if (!res.ok) throw new Error("No fallback fetch");
         const payload = await res.json();
         if (payload && Array.isArray(payload.data)) {
