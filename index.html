@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ניקנור וחננאל - ממשק ניהול מובייל</title>
+<style>
+:root {
+  --bg:#f5f1e8; --card:#fffdfa; --text:#1f2937; --muted:#6b7280;
+  --gold:#d4a43f; --gold2:#f0c86a; --blue:#e8f3ff; --blueText:#24537c;
+  --ok:#2f7d4a; --okBg:#e7f5eb; --warn:#9a5f12; --warnBg:#fff2df; --danger:#a33a31; --dangerBg:#fde8e6;
+  --shadow:0 10px 24px rgba(31,41,55,.08); --radius:22px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#fbf8f1 0%, var(--bg) 100%);color:var(--text)}
+.app{max-width:470px;margin:0 auto;min-height:100vh;padding-bottom:90px}
+header{padding:16px}
+.hero{background:linear-gradient(135deg,#fff8ea 0%, #fff 55%, #eef6ff 100%);border-radius:28px;padding:18px;box-shadow:var(--shadow);border:1px solid rgba(212,164,63,.18)}
+.kicker{color:var(--gold);font-size:13px;font-weight:700;margin-bottom:6px}
+h1{margin:0;font-size:30px}
+.sub{margin-top:6px;color:var(--muted);font-size:14px;line-height:1.5}
+.row{display:flex;gap:10px;align-items:center}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.btn{appearance:none;border:none;text-decoration:none;cursor:pointer;border-radius:16px;padding:13px 14px;font-weight:700;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--gold);color:white}
+.btn.secondary{background:var(--blue);color:var(--blueText)}
+.btn.ghost{background:#fff;color:var(--text);border:1px solid #ece7dc}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.banner{margin:0 16px 10px;background:#fff8df;color:#7a5a17;padding:10px 12px;border-radius:14px;border:1px solid #f1deaa;font-size:13px}
+section{padding:8px 16px}
+.section-title{font-size:18px;font-weight:800;margin:6px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);border:1px solid rgba(31,41,55,.05)}
+.kpi .label{color:var(--muted);font-size:13px}
+.kpi .value{font-size:28px;font-weight:800;margin-top:6px}
+.kpi .hint{margin-top:4px;font-size:12px;color:var(--muted)}
+.owner{font-size:18px;font-weight:800}
+.meta,.small{color:var(--muted);font-size:13px;line-height:1.45}
+.small{font-size:12px}
+.topline{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.bar{height:10px;background:#eee6d6;border-radius:999px;overflow:hidden}
+.bar > span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.tag{border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.tag.ok{background:var(--okBg);color:var(--ok)}
+.tag.warn{background:var(--warnBg);color:var(--warn)}
+.tag.danger{background:var(--dangerBg);color:var(--danger)}
+.tag.info{background:#e9f4ff;color:#285c8d}
+.house-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.house-tile{cursor:pointer}
+.street-title{font-size:16px;font-weight:800;margin:0 0 10px;color:#7a5a17}
+.house-selects{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.select-wrap{background:#fffdfa;border-radius:18px;padding:12px;box-shadow:var(--shadow)}
+.select-wrap select{width:100%;border:none;background:#f9f6ef;border-radius:14px;padding:12px;font-size:14px}
+.toolbar{display:flex;gap:10px;margin-bottom:12px}
+.search{flex:1;border:none;background:white;border-radius:16px;padding:13px 14px;box-shadow:var(--shadow);font-size:14px}
+.chips{display:flex;gap:8px;overflow:auto;padding-bottom:4px;scrollbar-width:none}
+.chip{white-space:nowrap;border:none;cursor:pointer;background:#fff;color:var(--text);border-radius:999px;padding:10px 14px;font-weight:700;box-shadow:var(--shadow)}
+.chip.active{background:var(--gold);color:#fff}
+.apartment-card{margin-bottom:12px;cursor:pointer}
+.note{color:var(--muted);font-size:13px;line-height:1.55}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.row-actions{display:flex;gap:10px;margin-top:12px}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.breadcrumb{color:var(--muted);font-size:13px;margin-bottom:10px}
+.hidden{display:none!important}
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,253,248,.94);backdrop-filter:blur(8px);border-top:1px solid #e8e0d0;padding:10px 14px}
+.nav-inner{max-width:470px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.nav-btn{border:none;background:none;border-radius:16px;padding:10px 6px;color:#7a7467;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.nav-btn.active{background:#fff;box-shadow:var(--shadow);color:#1f2937}
+.dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:0 0 auto}
+.insight{display:flex;gap:10px;align-items:flex-start;background:linear-gradient(180deg,#fff,#fffaf0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="hero">
+      <div class="kicker">פרויקט ניקנור וחננאל</div>
+      <h1>ממשק ניהול צפייה</h1>
+      <div class="sub">מובייל, RTL, טעינה חיה מה-API, חלוקה לרחוב → בית → דייר → כרטיס מלא.</div>
+      <div class="actions">
+        <button class="btn primary" onclick="manualReload()">טען נתונים עכשיו</button>
+        <a class="btn secondary" href="https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing" target="_blank" rel="noopener">פתח Sheets</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="banner" id="data-banner">טוען נתונים...</div>
+
+  <section id="dashboard-tab">
+    <div class="card">
+      <div class="topline">
+        <div>
+          <div class="owner" style="font-size:17px;">סנכרון נתונים</div>
+          <div class="meta" id="sync-status">מתחילה טעינה אוטומטית.</div>
+        </div>
+        <span class="tag info" id="sync-badge">טוען...</span>
+      </div>
+    </div>
+
+    <div class="section-title">תמונת מצב</div>
+    <div class="grid">
+      <div class="card kpi"><div class="label">סה״כ דירות</div><div class="value" id="kpi-total">0</div><div class="hint">רשומות פעילות</div></div>
+      <div class="card kpi"><div class="label">חתומים</div><div class="value" id="kpi-signed">0</div><div class="hint">לפי checkbox חתימות</div></div>
+      <div class="card kpi"><div class="label">חסרי טלפון</div><div class="value" id="kpi-missing-phone">0</div><div class="hint">דורש השלמה</div></div>
+      <div class="card kpi"><div class="label">מתנגדים / לא מעוניינים</div><div class="value" id="kpi-opponents">0</div><div class="hint">מוקד טיפול</div></div>
+    </div>
+
+    <div class="section-title">מצג בתים גרפי</div>
+    <div class="card" id="buildings-progress"></div>
+
+    <div class="section-title">תובנות מיידיות</div>
+    <div id="quick-insights"></div>
+  </section>
+
+  <section id="apartments-tab" class="hidden">
+    <div class="section-title">רשימת דיירים</div>
+    <div class="breadcrumb" id="apartments-breadcrumb">רחוב → בית → דייר → כרטיס מלא</div>
+    <div class="row-actions hidden" id="apartments-back">
+      <button class="btn ghost" onclick="undoView()">↩ Undo</button>
+    </div>
+    <div class="toolbar">
+      <input id="searchInput" class="search" placeholder="חיפוש לפי שם, בניין, טלפון, הערה..." oninput="renderHierarchy()"/>
+    </div>
+    <div class="chips">
+      <button class="chip active" data-filter="all" onclick="setFilter('all', event)">הכל</button>
+      <button class="chip" data-filter="signed" onclick="setFilter('signed', event)">חתומים</button>
+      <button class="chip" data-filter="undecided" onclick="setFilter('undecided', event)">מתלבטים</button>
+      <button class="chip" data-filter="opponents" onclick="setFilter('opponents', event)">מתנגדים</button>
+      <button class="chip" data-filter="missingPhone" onclick="setFilter('missingPhone', event)">חסרי טלפון</button>
+    </div>
+    <div id="apartments-list" style="margin-top:12px;"></div>
+  </section>
+
+  <section id="detail-tab" class="hidden">
+    <div class="section-title">כרטיס דייר מלא</div>
+    <div class="row-actions">
+      <button class="btn ghost" onclick="undoView()">↩ Undo</button>
+    </div>
+    <div id="detail-card"></div>
+  </section>
+
+  <section id="insights-tab" class="hidden">
+    <div class="section-title">תובנות בכל הרמות</div>
+    <div id="insights-content"></div>
+  </section>
+
+  <section id="settings-tab" class="hidden">
+    <div class="section-title">הגדרות ומידע</div>
+    <div class="card">
+      <div class="owner">המערכת מחוברת ל-Apps Script</div>
+      <div class="meta" style="margin-top:8px;">אם הטעינה החיה נכשלת, הממשק מציג נתוני גיבוי עדכניים כדי שלא ייתקע.</div>
+      <div class="quick-actions">
+        <button class="btn primary" onclick="manualReload()">טען מחדש</button>
+        <a class="btn secondary" href="https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing" target="_blank" rel="noopener">פתח Sheet</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" data-tab="dashboard" onclick="showTab('dashboard')"><span>🏠</span><span>דשבורד</span></button>
+    <button class="nav-btn" data-tab="apartments" onclick="resetHierarchy(); showTab('apartments'); renderHierarchy();"><span>🏢</span><span>דירות</span></button>
+    <button class="nav-btn" data-tab="insights" onclick="showTab('insights')"><span>💡</span><span>תובנות</span></button>
+    <button class="nav-btn" data-tab="settings" onclick="showTab('settings')"><span>⚙️</span><span>הגדרות</span></button>
+  </div>
+</nav>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzi43pAaHMFj9aI5GPpkQBzN37PZZSSrmkUQ_KrQOvfdW5lwYwmDV78WplyWPxZ7JEa/exec";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing";
+const fallbackPayload = {"success":true,"total":95,"data":[{"source":"ניקנור","owner":"בנימין יצחק","phone":"","building":"9","floor":"1","unit":"1","notes":"להשיג טלפון","signed":false},{"source":"ניקנור","owner":"שפרן אסף מיכאל","phone":"050-5311211","building":"9","floor":"1","unit":"2","notes":"אבי שוחח אתו, שלח תכנית הדמיה. לחזור אליו לפגישה","signed":false},{"source":"ניקנור","owner":"שפרן נעמה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"סלע יאיר","phone":"052-5665105","building":"9","floor":"2","unit":"3","notes":"פועל על פי שפרן","signed":false},{"source":"ניקנור","owner":"שפרן אסף מיכאל","phone":"050-5311211","building":"9","floor":"2","unit":"4","notes":"","signed":false},{"source":"ניקנור","owner":"עראקי ציונה","phone":"050-6205114","building":"11","floor":"1","unit":"1","notes":"חתום","signed":true},{"source":"ניקנור","owner":"כהן שלמה","phone":"","building":"11","floor":"1","unit":"2","notes":"חתום","signed":true},{"source":"ניקנור","owner":"כהן נתנאלה","phone":"050-7413325","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"חזני מיכאל","phone":"050-5066308","building":"11","floor":"2","unit":"3","notes":"חתום","signed":true},{"source":"ניקנור","owner":"חזני כהן יעל","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"קריעף ראובן","phone":"052-5346011","building":"11","floor":"2","unit":"4","notes":"חתום","signed":true},{"source":"ניקנור","owner":"קריעף יוכבד","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו אברהם","phone":"","building":"13","floor":"1","unit":"1","notes":"רוצים למכור את הירושה , לא מעוניינים  כרגע","signed":false},{"source":"ניקנור","owner":"רביבו יהודה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"שריקי עליזה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו אבנר","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו כהן יעל","phone":"","building":"","floor":"","unit":"","notes":"רוצים למכור","signed":false},{"source":"ניקנור","owner":"אביטל מזל מלי","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביב גלית גליה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו דוד","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו מאיר","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו בן איש","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו בנימין","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו מסר לי","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו קים","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"אוחנה ליאור","phone":"","building":"13","floor":"2","unit":"3","notes":"אבא שלו גר בהמשך הרחוב, צריך להשיג את יוסי האבא. בטח]ול אבי/יהודה","signed":false},{"source":"ניקנור","owner":"פלמן ברוריה","phone":"058-7097744","building":"13","floor":"2","unit":"4","notes":"חתום","signed":true},{"source":"ניקנור","owner":"רביבו ירושה","phone":"","building":"15","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"רביבו ירושה","phone":"","building":"15","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"איטח תמר","phone":"","building":"15","floor":"","unit":"","notes":"חתמה נציגות ליהודית וערערנו אותה","signed":false},{"source":"ניקנור","owner":"יאיר שבו","phone":"","building":"15","floor":"","unit":"","notes":"לתאם פכישה עם איטח במשרד לחתימה. יהודה","signed":false},{"source":"ניקנור","owner":"פאראג לילה","phone":"054-2033945","building":"17","floor":"1","unit":"1","notes":"יהודה מתאם שיעזוב את החתימות של כרמים לפני שנתיים אמר שיעבור אלינו","signed":false},{"source":"ניקנור","owner":"אוחנה אופיר","phone":"","building":"17","floor":"1","unit":"2","notes":"","signed":false},{"source":"ניקנור","owner":"חן ירון","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"פרי מזל","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"חן משה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"אוחנה יוסף","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"חן בנימין","phone":"054-4228523","building":"","floor":"","unit":"","notes":"מטפל עבור המשפחה מול יהודה","signed":false},{"source":"ניקנור","owner":"ששון אילנה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"גבאי שלום","phone":"","building":"17","floor":"2","unit":"3","notes":"להשיג טלפון","signed":false},{"source":"ניקנור","owner":"גבאי גאולה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"עמרן אופירה","phone":"","building":"17","floor":"2","unit":"4","notes":"להשיג טלפון","signed":false},{"source":"ניקנור","owner":"עמרן נועם","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"מרים","phone":"050-2964595","building":"19","floor":"","unit":"","notes":"בודקת מול המשפחה. ארז","signed":false},{"source":"ניקנור","owner":"כרמלה","phone":"054-5463489","building":"19","floor":"","unit":"","notes":"אמרה שתחתום דיברה עם יהודית והתחרטה","signed":false},{"source":"ניקנור","owner":"אורלי","phone":"054-5766244","building":"19","floor":"","unit":"","notes":"מיכל - 050-851229, ביקשה לקבל במייל את היפוי כח להראות לאחים, נשלח במייל 22.3.26","signed":false},{"source":"ניקנור","owner":"רוני","phone":"052-8608029","building":"19","floor":"","unit":"","notes":"ביקור בית בנטף. מברך על היוזמה אך מחוייב לכרמים. הבטיח לחתום בנובמבר בתום התחייבות לסיני","signed":false},{"source":"ניקנור","owner":"חיה","phone":"","building":"19","floor":"","unit":"","notes":"טלפון לא תקין, להשיג","signed":false},{"source":"ניקנור","owner":"אדוארד","phone":"054-5391047","building":"19","floor":"","unit":"","notes":"חתם","signed":true},{"source":"ניקנור","owner":"יוסי גולדמן","phone":"052-3826013","building":"21","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"יוסי גולדמן (דירה שניה)","phone":"","building":"21","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"אנייס ומוטי","phone":"","building":"21","floor":"","unit":"","notes":"לא מעוניינים","signed":false},{"source":"ניקנור","owner":"וולף","phone":"","building":"21","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"ראובן דניאל","phone":"050-8685850","building":"23","floor":"","unit":"","notes":"חתום","signed":true},{"source":"ניקנור","owner":"דניאל שמעון ואחיו","phone":"050-5236731","building":"23","floor":"","unit":"","notes":"חתום","signed":true},{"source":"ניקנור","owner":"אוחנה יוסף","phone":"050-5395636","building":"23","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"אסף צור","phone":"054-7876556","building":"23","floor":"","unit":"","notes":"חתום","signed":true},{"source":"ניקנור","owner":"רחמים דיין","phone":"052-2636570","building":"23","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"אנה קוץ","phone":"054-4818315","building":"25","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"תורג'מן זורה","phone":"","building":"25","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"שולמית עובד","phone":"050-2460570","building":"25","floor":"","unit":"","notes":"חתום","signed":true},{"source":"ניקנור","owner":"מומי אילוז","phone":"054-4920254","building":"25","floor":"","unit":"","notes":"חתום","signed":true},{"source":"ניקנור","owner":"שרון","phone":"053-7697597","building":"25","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"מלכה (ועד)","phone":"054-6367973","building":"27","floor":"17","unit":"","notes":"דיברה עם יהודה, הייתה בכנס (הייתה שלילית)","signed":false},{"source":"ניקנור","owner":"אמנון בן יאיר","phone":"052-6840204","building":"27","floor":"16","unit":"","notes":"יהודה שוחח - קבע רביעי 18.03","signed":false},{"source":"ניקנור","owner":"זוהר מאור","phone":"052-6071986","building":"27","floor":"","unit":"","notes":"16.03 יהודה שוחח קבע שיחה ל9:30 שלישי","signed":false},{"source":"ניקנור","owner":"חפצי","phone":"050-7229818","building":"27","floor":"","unit":"","notes":"להשיג טלפון","signed":false},{"source":"ניקנור","owner":"עפרה בן דוד","phone":"050-6238912","building":"27","floor":"","unit":"","notes":"ציפי קליין שוכרת 050-5661656","signed":false},{"source":"ניקנור","owner":"שרה רוס","phone":"054-3033467","building":"27","floor":"","unit":"","notes":"חתום (שלחה הודעת ביטול לאסי)","signed":true},{"source":"ניקנור","owner":"שבת זיוה","phone":"","building":"29","floor":"1","unit":"1","notes":"","signed":false},{"source":"ניקנור","owner":"שבת מיטל","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"גבאי מורן","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"שבת שלמה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"שבת שגיא יששכר","phone":"","building":"","floor":"","unit":"","notes":"אלמנה צריכה לדבר עם הבן ביקשה אחרי פסח לדבר","signed":false},{"source":"ניקנור","owner":"מרדכי גבי","phone":"052-2673757","building":"29","floor":"1","unit":"2","notes":"ישב עם אבי ויהודה חושב על הדברים","signed":false},{"source":"ניקנור","owner":"פרל מרדכי שושנה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"כהן רחל","phone":"","building":"29","floor":"2","unit":"3","notes":"","signed":false},{"source":"ניקנור","owner":"כהן נחמיה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"כהן אברהם","phone":"050-2499392","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"כהן שימחה","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"כהן צדוק","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"בארט דניאל","phone":"מתלבטים","building":"29","floor":"2","unit":"4","notes":"","signed":false},{"source":"ניקנור","owner":"בארט ענת","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"","phone":"‎0527906071","building":"","floor":"","unit":"","notes":"הדייר סקפטי ולאחר פגישה עם ארז ואסי התרכך אך עדיין לא חותם,להזמין אותו למשרד","signed":false},{"source":"ניקנור","owner":"גילה (הבת) (עזיזיאן ברוך?)","phone":"","building":"33","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"תורג'מן אבי","phone":"053-5253202","building":"33","floor":"","unit":"","notes":"אמר שאשתו מתנגדת ביקש לדחות את זה כרגע","signed":false},{"source":"ניקנור","owner":"עמידר","phone":"","building":"33","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"קרא ברוך","phone":"053-3341233","building":"33","floor":"","unit":"","notes":"אבא בגיל 82. יחידה נוספת תחתונה בן מתגוגרר, במילואים 19.03","signed":false},{"source":"ניקנור","owner":"הרב קריספין","phone":"","building":"35","floor":"","unit":"","notes":"חתום","signed":true},{"source":"ניקנור","owner":"צביקה","phone":"","building":"35","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"בר מרים","phone":"","building":"35","floor":"","unit":"","notes":"חתום","signed":true},{"source":"ניקנור","owner":"בר יצחק","phone":"","building":"","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"גן ילדים","phone":"","building":"35","floor":"","unit":"","notes":"","signed":false},{"source":"ניקנור","owner":"נגר משה","phone":"","building":"35","floor":"1","unit":"2","notes":"להשיג טלפון","signed":false},{"source":"ניקנור","owner":"ישיבה ובית כנסת \"יגל אברהם\" (ע\"ר)","phone":"","building":"35","floor":"1","unit":"7","notes":"","signed":false}]};
+const fallbackApartments = fallbackPayload.data || [];
+let apartments = [...fallbackApartments];
+let currentFilter = 'all';
+let currentStreet = null;
+let currentBuilding = null;
+let currentResidentKey = null;
+const viewHistory = [];
+
+function setBanner(message, tone='info') {
+  const el = document.getElementById('data-banner');
+  el.textContent = message;
+  el.style.background = tone === 'ok' ? '#eef9f0' : tone === 'danger' ? '#fde8e6' : '#fff8df';
+  el.style.borderColor = tone === 'ok' ? '#cbe7d1' : tone === 'danger' ? '#efcbc6' : '#f1deaa';
+  el.style.color = tone === 'ok' ? '#256b39' : tone === 'danger' ? '#a33a31' : '#7a5a17';
+}
+function setSyncStatus(text, badge='טוען...', tone='info') {
+  const status = document.getElementById('sync-status');
+  const chip = document.getElementById('sync-badge');
+  status.textContent = text;
+  chip.textContent = badge;
+  chip.className = 'tag ' + (tone === 'ok' ? 'ok' : tone === 'danger' ? 'danger' : 'info');
+}
+function syncTimestamp() {
+  return new Date().toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
+}
+function normalizedStreet(item) {
+  return item.source || 'לא ידוע';
+}
+function hasSignatureMarker(item) {
+  return item.signed === true || String(item.notes || '').includes('חתום');
+}
+function residentKey(a) {
+  return [normalizedStreet(a), a.building||'', a.unit||'', a.owner||'', a.phone||''].join('|');
+}
+function pushViewState() {
+  viewHistory.push({street: currentStreet, building: currentBuilding, residentKey: currentResidentKey, tab: currentResidentKey ? 'detail' : 'apartments'});
+  document.getElementById('apartments-back').classList.remove('hidden');
+}
+function resetHierarchy() {
+  currentStreet = null; currentBuilding = null; currentResidentKey = null; viewHistory.length = 0;
+  document.getElementById('apartments-back').classList.add('hidden');
+}
+function undoView() {
+  const prev = viewHistory.pop();
+  if (prev) {
+    currentStreet = prev.street; currentBuilding = prev.building; currentResidentKey = prev.residentKey;
+    showTab(prev.tab || (prev.residentKey ? 'detail' : 'apartments'));
+  } else {
+    resetHierarchy();
+    showTab('apartments');
+  }
+  if (!viewHistory.length) document.getElementById('apartments-back').classList.add('hidden');
+  renderHierarchy();
+}
+function openBuilding(street, building) {
+  pushViewState();
+  currentStreet = street; currentBuilding = String(building); currentResidentKey = null;
+  showTab('apartments');
+  renderHierarchy();
+}
+function openResident(key) {
+  pushViewState();
+  currentResidentKey = key;
+  showTab('detail');
+  renderHierarchy();
+}
+function statusClass(a) {
+  if (hasSignatureMarker(a)) return 'ok';
+  const txt = `${a.interest || ''} ${a.notes || ''}`;
+  if (txt.includes('מתנגד') || txt.includes('לא מעונ')) return 'danger';
+  return 'warn';
+}
+function statusLabel(a) {
+  if (hasSignatureMarker(a)) return 'חתום';
+  if (a.interest) return a.interest;
+  const txt = a.notes || '';
+  if (txt.includes('מתלבט')) return 'מתלבט';
+  if (txt.includes('מתנגד') || txt.includes('לא מעונ')) return 'מתנגד';
+  return 'בטיפול';
+}
+function signedPct() {
+  return apartments.length ? Math.round((apartments.filter(hasSignatureMarker).length / apartments.length) * 100) : 0;
+}
+function getBuildingStats() {
+  const groups = {};
+  apartments.forEach(item => {
+    const street = normalizedStreet(item);
+    const b = String(item.building || 'ללא מספר');
+    const key = street + '|' + b;
+    if (!groups[key]) groups[key] = {street, building: b, items: []};
+    groups[key].items.push(item);
+  });
+  return Object.values(groups).map(g => {
+    const total = g.items.length;
+    const signed = g.items.filter(hasSignatureMarker).length;
+    const missing = g.items.filter(i => !i.phone).length;
+    const opp = g.items.filter(i => (`${i.interest||''} ${i.notes||''}`).includes('מתנגד') || (`${i.interest||''} ${i.notes||''}`).includes('לא מעונ')).length;
+    return {...g, total, signed, missing, opp, pct: total ? Math.round((signed/total)*100) : 0};
+  }).sort((a,b) => a.street.localeCompare(b.street,'he') || (Number(a.building)||999)-(Number(b.building)||999));
+}
+function getStreetBuildingStats(street) {
+  return getBuildingStats().filter(b => b.street === street);
+}
+function applyFilter(item) {
+  if (currentFilter === 'signed') return hasSignatureMarker(item);
+  const txt = `${item.interest||''} ${item.notes||''}`;
+  if (currentFilter === 'undecided') return txt.includes('מתלבט');
+  if (currentFilter === 'opponents') return txt.includes('מתנגד') || txt.includes('לא מעונ');
+  if (currentFilter === 'missingPhone') return !item.phone;
+  return true;
+}
+function getFilteredApartments() {
+  const q = (document.getElementById('searchInput')?.value || '').trim();
+  return apartments.filter(applyFilter).filter(a => {
+    if (!q) return true;
+    const hay = [a.owner, a.phone, a.building, a.floor, a.unit, a.notes, a.source].join(' ');
+    return hay.includes(q);
+  });
+}
+function setFilter(filter, event) {
+  currentFilter = filter;
+  document.querySelectorAll('.chip').forEach(el => el.classList.remove('active'));
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  renderHierarchy();
+}
+function fillKPIs() {
+  document.getElementById('kpi-total').textContent = apartments.length;
+  document.getElementById('kpi-signed').textContent = apartments.filter(hasSignatureMarker).length;
+  document.getElementById('kpi-missing-phone').textContent = apartments.filter(a => !a.phone).length;
+  document.getElementById('kpi-opponents').textContent = apartments.filter(a => (`${a.interest||''} ${a.notes||''}`).includes('מתנגד') || (`${a.interest||''} ${a.notes||''}`).includes('לא מעונ')).length;
+}
+function renderQuickInsights() {
+  const missingPhone = apartments.filter(a => !a.phone).length;
+  const signed = apartments.filter(hasSignatureMarker).length;
+  const noNotes = apartments.filter(a => !(a.notes||'').trim()).length;
+  document.getElementById('quick-insights').innerHTML = `
+    <div class="card insight" style="margin-bottom:10px;"><span class="dot" style="background:#f0a95b"></span><div>יש <b>${missingPhone}</b> רשומות ללא טלפון.</div></div>
+    <div class="card insight" style="margin-bottom:10px;"><span class="dot" style="background:#7fb18a"></span><div>נכון לעכשיו מזוהים <b>${signed}</b> חתומים.</div></div>
+    <div class="card insight"><span class="dot" style="background:#e67b73"></span><div>יש <b>${noNotes}</b> רשומות ללא הערה, וזה פוגע באיכות המעקב.</div></div>
+  `;
+}
+function renderBuildingProgress() {
+  const box = document.getElementById('buildings-progress');
+  const streets = ['ניקנור','חננאל'];
+  box.innerHTML = streets.map(street => {
+    const rows = getStreetBuildingStats(street);
+    return `
+      <div style="margin-bottom:18px;">
+        <div class="street-title">${street}</div>
+        <div class="house-grid">
+          ${rows.map(b => `
+            <div class="card house-tile" onclick="openBuilding('${street}','${String(b.building).replace(/'/g,"&#39;")}')">
+              <div class="owner">בית ${b.building}</div>
+              <div class="meta">${b.total} דיירים</div>
+              <div class="bar" style="margin:10px 0 8px;"><span style="width:${b.pct}%"></span></div>
+              <div class="topline"><span class="small">חתימות</span><span class="tag ${b.pct >= 60 ? 'ok' : (b.pct >= 30 ? 'warn' : 'danger')}">${b.pct}%</span></div>
+            </div>
+          `).join('') || `<div class="card">אין נתונים ל-${street}</div>`}
+        </div>
+      </div>
+    `;
+  }).join('') + `
+    <div class="house-selects">
+      ${['ניקנור','חננאל'].map(street => {
+        const rows = getStreetBuildingStats(street);
+        return `
+          <div class="select-wrap">
+            <div class="owner" style="font-size:16px;">בחירת בית ${street}</div>
+            <div class="small" style="margin:6px 0 10px;">רשימת גלילה מהירה</div>
+            <select onchange="if(this.value) openBuilding('${street}', this.value)">
+              <option value="">בחר בית</option>
+              ${rows.map(b => `<option value="${b.building}">בית ${b.building} · ${b.pct}% חתימות</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }).join('')}
+    </div>`;
+}
+function renderResidentList(list, street, building) {
+  return list.map(a => `
+    <div class="card apartment-card" onclick="openResident('${residentKey(a).replace(/'/g,"&#39;")}')">
+      <div class="topline">
+        <div>
+          <div class="owner">${a.owner || 'ללא שם'}</div>
+          <div class="meta">${street} · בית ${building} · קומה ${a.floor || '-'} · יחידה ${a.unit || '-'}</div>
+        </div>
+        <span class="tag ${statusClass(a)}">${statusLabel(a)}</span>
+      </div>
+      <div class="meta" style="margin-top:8px;"><strong>טלפון:</strong> ${a.phone || 'לא קיים'}</div>
+      <div class="note" style="margin-top:8px;"><strong>הערה:</strong> ${a.notes || 'אין הערה'}</div>
+      <div class="row-actions">
+        ${a.phone ? `<a class="btn primary" href="tel:${String(a.phone).replace(/[^\d+]/g,'')}" onclick="event.stopPropagation()">חיוג</a>` : `<button class="btn primary" disabled>אין טלפון</button>`}
+        <button class="btn secondary" onclick="event.stopPropagation(); openResident('${residentKey(a).replace(/'/g,"&#39;")}')">כרטיס מלא</button>
+      </div>
+    </div>
+  `).join('');
+}
+function renderResidentDetail(item) {
+  const box = document.getElementById('detail-card');
+  if (!item) {
+    box.innerHTML = `<div class="card">לא נמצא דייר.</div>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="card">
+      <div class="topline">
+        <div>
+          <div class="owner" style="font-size:22px;">${item.owner || 'ללא שם'}</div>
+          <div class="meta">${normalizedStreet(item)} → בית ${item.building || '-'} → קומה ${item.floor || '-'} → יחידה ${item.unit || '-'}</div>
+        </div>
+        <span class="tag ${statusClass(item)}">${statusLabel(item)}</span>
+      </div>
+      <div class="tags">
+        ${item.phone ? '<span class="tag info">יש טלפון</span>' : '<span class="tag danger">חסר טלפון</span>'}
+        ${hasSignatureMarker(item) ? '<span class="tag ok">חתום</span>' : '<span class="tag warn">לא חתום</span>'}
+      </div>
+      <div class="detail-grid" style="margin-top:12px;">
+        <div class="card"><div class="small">טלפון</div><div class="owner" style="font-size:18px;">${item.phone || 'לא קיים'}</div></div>
+        <div class="card"><div class="small">רחוב / בית</div><div class="owner" style="font-size:18px;">${normalizedStreet(item)} ${item.building || '-'}</div></div>
+        <div class="card"><div class="small">קומה</div><div class="owner" style="font-size:18px;">${item.floor || '-'}</div></div>
+        <div class="card"><div class="small">יחידה</div><div class="owner" style="font-size:18px;">${item.unit || '-'}</div></div>
+      </div>
+      <div class="card" style="margin-top:12px;">
+        <div class="small">הערות</div>
+        <div style="margin-top:8px;line-height:1.6">${item.notes || 'אין הערות'}</div>
+      </div>
+      <div class="quick-actions">
+        ${item.phone ? `<a class="btn primary" href="tel:${String(item.phone).replace(/[^\d+]/g,'')}">חיוג מהיר</a>` : `<button class="btn primary" disabled>אין טלפון</button>`}
+        <a class="btn secondary" href="${SHEET_URL}" target="_blank" rel="noopener">פתח Sheet</a>
+        <button class="btn ghost" onclick="undoView()">↩ Undo</button>
+        <button class="btn ghost" onclick="currentResidentKey=null; showTab('apartments'); renderHierarchy();">חזרה לדיירים</button>
+      </div>
+    </div>`;
+}
+function renderHierarchy() {
+  const list = document.getElementById('apartments-list');
+  const crumb = document.getElementById('apartments-breadcrumb');
+  let filtered = getFilteredApartments();
+
+  if (currentResidentKey) {
+    const item = apartments.find(a => residentKey(a) === currentResidentKey);
+    renderResidentDetail(item);
+    return;
+  }
+
+  if (!currentStreet && !currentBuilding) {
+    crumb.textContent = 'רחוב → בית → דייר → כרטיס מלא';
+    list.innerHTML = ['ניקנור','חננאל'].map(street => {
+      const rows = getStreetBuildingStats(street);
+      return `
+        <div style="margin-bottom:18px;">
+          <div class="street-title">${street}</div>
+          ${rows.map(b => `
+            <div class="card apartment-card" onclick="openBuilding('${street}','${String(b.building).replace(/'/g,"&#39;")}')">
+              <div class="topline">
+                <div><div class="owner">בית ${b.building}</div><div class="meta">${b.total} דיירים · ${b.missing} בלי טלפון</div></div>
+                <span class="tag ${b.pct >= 60 ? 'ok' : (b.pct >= 30 ? 'warn' : 'danger')}">${b.pct}% חתימות</span>
+              </div>
+              <div class="bar" style="margin-top:10px;"><span style="width:${b.pct}%"></span></div>
+            </div>`).join('')}
+        </div>`;
+    }).join('');
+    return;
+  }
+
+  if (currentStreet) filtered = filtered.filter(a => normalizedStreet(a) === currentStreet);
+  if (currentBuilding) filtered = filtered.filter(a => String(a.building || '') === String(currentBuilding));
+
+  crumb.textContent = currentBuilding ? `${currentStreet} → בית ${currentBuilding} → דיירים` : `${currentStreet} → בתים`;
+  if (!currentBuilding) {
+    const rows = getStreetBuildingStats(currentStreet);
+    list.innerHTML = rows.map(b => `
+      <div class="card apartment-card" onclick="openBuilding('${currentStreet}','${String(b.building).replace(/'/g,"&#39;")}')">
+        <div class="topline">
+          <div><div class="owner">בית ${b.building}</div><div class="meta">${b.total} דיירים · ${b.missing} בלי טלפון · ${b.opp} מתנגדים</div></div>
+          <span class="tag ${b.pct >= 60 ? 'ok' : (b.pct >= 30 ? 'warn' : 'danger')}">${b.pct}% חתימות</span>
+        </div>
+        <div class="bar" style="margin-top:10px;"><span style="width:${b.pct}%"></span></div>
+      </div>`).join('');
+    return;
+  }
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="card">לא נמצאו דיירים לבית זה.</div>`;
+    return;
+  }
+  list.innerHTML = renderResidentList(filtered, currentStreet, currentBuilding);
+}
+function renderInsights() {
+  const box = document.getElementById('insights-content');
+  const projectSigned = signedPct();
+  const buildingRows = getBuildingStats();
+  const weakBuildings = buildingRows.filter(b => b.pct < projectSigned || b.missing > 0 || b.opp > 0);
+  box.innerHTML = `
+    <div class="card" style="margin-bottom:12px;">
+      <div class="owner">רמת פרויקט</div>
+      <div class="meta" style="margin-top:8px;">אחוז חתימות כללי: <b>${projectSigned}%</b></div>
+      <div class="meta">חסרי טלפון: <b>${apartments.filter(a=>!a.phone).length}</b></div>
+      <div class="meta">רשומות ללא הערה: <b>${apartments.filter(a => !(a.notes||'').trim()).length}</b></div>
+    </div>
+    ${
+      ['ניקנור','חננאל'].map(street => {
+        const rows = getStreetBuildingStats(street);
+        const streetSigned = rows.reduce((s,b)=>s+b.signed,0);
+        const streetTotal = rows.reduce((s,b)=>s+b.total,0);
+        const pct = streetTotal ? Math.round((streetSigned/streetTotal)*100) : 0;
+        return `
+          <div class="card" style="margin-bottom:12px;">
+            <div class="owner">${street}</div>
+            <div class="meta" style="margin-top:8px;">אחוז חתימות ברחוב: <b>${pct}%</b></div>
+            <div class="meta">בתים פעילים: <b>${rows.length}</b></div>
+          </div>`;
+      }).join('')
+    }
+    <div class="section-title">מוקדי טיפול ברמת בית</div>
+    ${
+      weakBuildings.map(b => `
+        <div class="card" style="margin-bottom:10px;">
+          <div class="topline">
+            <div><div class="owner">${b.street} · בית ${b.building}</div><div class="meta">${b.total} דיירים</div></div>
+            <span class="tag ${b.pct >= 60 ? 'ok' : (b.pct >= 30 ? 'warn' : 'danger')}">${b.pct}%</span>
+          </div>
+          <div class="note" style="margin-top:8px;">
+            ${b.pct < projectSigned ? 'אחוז החתימות נמוך מהממוצע הכללי. ' : ''}
+            ${b.missing > 0 ? `יש ${b.missing} חסרי טלפון. ` : ''}
+            ${b.opp > 0 ? `יש ${b.opp} מוקדי התנגדות או אי-עניין. ` : ''}
+          </div>
+        </div>`).join('') || `<div class="card">אין כרגע מוקדי חריגה בולטים.</div>`
+    }
+  `;
+}
+function showTab(tab) {
+  ['dashboard','apartments','detail','insights','settings'].forEach(name => {
+    document.getElementById(name + '-tab').classList.toggle('hidden', name !== tab);
+  });
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function rerenderAll() {
+  fillKPIs();
+  renderQuickInsights();
+  renderBuildingProgress();
+  renderHierarchy();
+  renderInsights();
+}
+function normalizeApiRow(row) {
+  return {
+    source: row.source || '',
+    owner: row.owner || '',
+    phone: row.phone || '',
+    building: String(row.building || '').trim(),
+    floor: String(row.floor || '').trim(),
+    unit: String(row.unit || '').trim(),
+    notes: row.notes || '',
+    signed: !!row.signed,
+    interest: row.interest || ''
+  };
+}
+async function loadLiveData() {
+  setBanner('טוען נתונים אוטומטית מה-API...', 'info');
+  setSyncStatus('מתבצעת טעינה אוטומטית מה-API.', 'טוען...', 'info');
+  const res = await fetch(API_URL, {cache:'no-store'});
+  if (!res.ok) throw new Error('API failed');
+  const payload = await res.json();
+  if (!payload || payload.success !== true || !Array.isArray(payload.data)) throw new Error('Invalid payload');
+  apartments = payload.data.map(normalizeApiRow).filter(r => r.owner || r.phone || r.building || r.notes);
+  if (!apartments.length) throw new Error('No rows from API');
+  setBanner(`נטענו ${apartments.length} רשומות חיות מה-API.`, 'ok');
+  setSyncStatus(`הנתונים החיים נטענו בהצלחה בשעה ${syncTimestamp()}.`, 'חי', 'ok');
+}
+async function manualReload() {
+  try {
+    await loadLiveData();
+  } catch (err) {
+    console.error(err);
+    apartments = [...fallbackApartments];
+    setBanner('הטעינה היזומה נכשלה. מוצגים נתוני גיבוי עדכניים.', 'danger');
+    setSyncStatus('הטעינה היזומה נכשלה. מוצגים נתוני גיבוי.', 'גיבוי', 'danger');
+  }
+  rerenderAll();
+}
+async function initApp() {
+  rerenderAll();
+  try {
+    await loadLiveData();
+  } catch (err) {
+    console.error(err);
+    apartments = [...fallbackApartments];
+    setBanner('לא ניתן היה לטעון כרגע נתונים חיים. מוצגים נתוני גיבוי עדכניים.', 'danger');
+    setSyncStatus('טעינה אוטומטית נכשלה. מוצגים נתוני גיבוי.', 'גיבוי', 'danger');
+  }
+  rerenderAll();
+}
+initApp();
+</script>
+</body>
+</html>
