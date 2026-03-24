@@ -438,6 +438,12 @@
         </div>
 
         <div class="card kpi">
+          <div class="label">סה״כ חתימות</div>
+          <div class="value" id="kpi-total-signatures">0</div>
+          <div class="hint">מספר חתימות בפועל</div>
+        </div>
+
+        <div class="card kpi">
           <div class="label">אחוז חתימה מכלל המתחם</div>
           <div class="value" id="kpi-signature-rate">0%</div>
           <div class="hint">סך החתימות אל מול 123 דירות</div>
@@ -734,7 +740,9 @@
     }
 
     function fillKPIs() {
+      const totalSignatures = totalSignaturesCount();
       document.getElementById("kpi-buildings").textContent = TOTAL_UNITS_IN_COMPLEX;
+      document.getElementById("kpi-total-signatures").textContent = totalSignatures;
       document.getElementById("kpi-signature-rate").textContent = overallSignaturePct() + "%";
     }
 
@@ -750,7 +758,7 @@
       document.getElementById("quick-insights").innerHTML = `
         <div class="card insight">
           <span class="dot" style="background:#7fb18a"></span>
-          <div>יש כרגע <b>${totalSignedRows}</b> חתימות מתוך 123 דירות, שהם <b>${overallSignaturePct()}%</b> מכלל המתחם.</div>
+          <div>יש כרגע <b>${totalSignedRows}</b> חתימות מתוך 123 דירות, שהן <b>${overallSignaturePct()}%</b> מכלל המתחם.</div>
         </div>
 
         <div class="card insight">
@@ -980,7 +988,7 @@
         <div class="card" style="margin-bottom:12px;">
           <div class="owner">רמת פרויקט</div>
           <div class="meta" style="margin-top:8px;">אחוז חתימה מכלל המתחם: <b>${projectPct}%</b></div>
-          <div class="meta">סך חתימות בפועל: <b>${totalSignedRows}</b></div>
+          <div class="meta">סה״כ חתימות בפועל: <b>${totalSignedRows}</b></div>
           <div class="meta">סה״כ יחידות במתחם: <b>${TOTAL_UNITS_IN_COMPLEX}</b></div>
         </div>
 
@@ -1007,7 +1015,7 @@
                 <span class="status-dot ${buildingDotClass(b)}"></span>
               </div>
               <div class="note" style="margin-top:8px;">
-                ${b.pct < 100 ? "הבניין עדיין לא חתום מלא. " : ""}
+                ${b.pct < 100 ? "הבניין עדיין לא הושלם בחתימות. " : ""}
                 ${b.missing > 0 ? `יש ${b.missing} רשומות ללא טלפון. ` : ""}
                 ${b.opp > 0 ? `יש ${b.opp} מוקדי התנגדות או אי-עניין. ` : ""}
               </div>
