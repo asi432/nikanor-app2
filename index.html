@@ -430,24 +430,23 @@
       </div>
 
       <div class="section-title">תמונת מצב</div>
-      <div class="grid">
-        <div class="card kpi">
-          <div class="label">סה״כ יחידות במתחם</div>
-          <div class="value" id="kpi-buildings">123</div>
-          <div class="hint">לפי הספירה שסוכמה</div>
-        </div>
+     <div class="grid">
+  <div class="card kpi">
+    <div class="label">סה״כ יחידות במתחם</div>
+    <div class="value" id="kpi-buildings">123</div>
+    <div class="hint">לפי הספירה שסוכמה</div>
+  </div>
 
-        <div class="card kpi">
-          <div class="label">סה״כ חתימות</div>
-          <div class="value" id="kpi-total-signatures">0</div>
-          <div class="hint">מספר חתימות בפועל</div>
-        </div>
+  <div class="card kpi">
+    <div class="label">סה״כ חתימות</div>
+    <div class="value" id="kpi-total-signatures">0</div>
+    <div class="hint">מספר חתימות בפועל</div>
+  </div>
 
-        <div class="card kpi">
-          <div class="label">אחוז חתימה מכלל המתחם</div>
-          <div class="value" id="kpi-signature-rate">0%</div>
-          <div class="hint">סך החתימות אל מול 123 דירות</div>
-        </div>
+  <div class="card kpi">
+    <div class="label">אחוז חתימה מכלל המתחם</div>
+    <div class="value" id="kpi-signature-rate">0%</div>
+    <div class="hint">סך החתימות אל מול 123 דירות</div>
       </div>
 
       <div class="section-title">מצב בניינים גרפי</div>
@@ -738,12 +737,13 @@
       if (event && event.currentTarget) event.currentTarget.classList.add("active");
       renderHierarchy();
     }
+function fillKPIs() {
+  const totalSignatures = totalSignaturesCount();
 
-    function fillKPIs() {
-      const totalSignatures = totalSignaturesCount();
-      document.getElementById("kpi-buildings").textContent = TOTAL_UNITS_IN_COMPLEX;
-      document.getElementById("kpi-total-signatures").textContent = totalSignatures;
-      document.getElementById("kpi-signature-rate").textContent = overallSignaturePct() + "%";
+  document.getElementById("kpi-buildings").textContent = TOTAL_UNITS_IN_COMPLEX;
+  document.getElementById("kpi-total-signatures").textContent = totalSignatures;
+  document.getElementById("kpi-signature-rate").textContent = overallSignaturePct() + "%";
+}
     }
 
     function renderQuickInsights() {
