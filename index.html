@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ניקנור וחננאל - ממשק ניהול מובייל</title>
+  <title>ניקנור וחננאל - ממשק ניהול</title>
   <style>
-    :root {
+    :root{
       --bg:#f5f1e8;
       --card:#fffdfa;
       --text:#1f2937;
@@ -23,64 +23,53 @@
       --shadow:0 10px 24px rgba(31,41,55,.08);
       --radius:22px;
     }
-
-    * { box-sizing:border-box; }
-
-    body {
+    *{box-sizing:border-box}
+    body{
       margin:0;
       font-family:Arial,Helvetica,sans-serif;
-      background:linear-gradient(180deg,#fbf8f1 0%, var(--bg) 100%);
+      background:linear-gradient(180deg,#fbf8f1 0%,var(--bg) 100%);
       color:var(--text);
     }
-
-    .app {
-      max-width:470px;
+    .app{
+      max-width:480px;
       margin:0 auto;
       min-height:100vh;
-      padding-bottom:92px;
+      padding:16px 16px 90px;
     }
-
-    header { padding:16px; }
-
-    .hero {
-      background:linear-gradient(135deg,#fff8ea 0%, #fff 55%, #eef6ff 100%);
+    .hero{
+      background:linear-gradient(135deg,#fff8ea 0%,#fff 55%,#eef6ff 100%);
       border-radius:28px;
       padding:18px;
       box-shadow:var(--shadow);
       border:1px solid rgba(212,164,63,.18);
     }
-
-    .kicker {
+    .kicker{
       color:var(--gold);
       font-size:13px;
       font-weight:700;
       margin-bottom:6px;
     }
-
-    h1 {
+    h1{
       margin:0;
-      font-size:30px;
+      font-size:28px;
     }
-
-    .sub {
-      margin-top:6px;
+    .sub{
+      margin-top:8px;
       color:var(--muted);
       font-size:14px;
       line-height:1.5;
     }
-
-    .actions {
+    .actions{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:10px;
       margin-top:14px;
     }
-
-    .btn {
+    .btn{
       appearance:none;
       border:none;
-      text-decoration:none;
       cursor:pointer;
+      text-decoration:none;
       border-radius:16px;
       padding:13px 14px;
       font-weight:700;
@@ -88,476 +77,219 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:8px;
     }
-
-    .btn.primary {
-      background:var(--gold);
-      color:white;
-    }
-
-    .btn.secondary {
-      background:var(--blue);
-      color:var(--blueText);
-    }
-
-    .btn.ghost {
-      background:#fff;
-      color:var(--text);
-      border:1px solid #ece7dc;
-    }
-
-    .btn:disabled {
-      opacity:.45;
-      cursor:not-allowed;
-    }
-
-    .banner {
-      margin:0 16px 10px;
+    .btn.primary{background:var(--gold);color:#fff}
+    .btn.secondary{background:var(--blue);color:var(--blueText)}
+    .banner{
+      margin-top:14px;
       background:#fff8df;
       color:#7a5a17;
-      padding:10px 12px;
+      padding:11px 12px;
       border-radius:14px;
       border:1px solid #f1deaa;
       font-size:13px;
     }
-
-    section { padding:8px 16px; }
-
-    .section-title {
-      font-size:18px;
-      font-weight:800;
-      margin:6px 0 12px;
-    }
-
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:12px;
-    }
-
-    .card {
+    .card{
       background:var(--card);
       border-radius:var(--radius);
       padding:14px;
       box-shadow:var(--shadow);
       border:1px solid rgba(31,41,55,.05);
     }
-
-    .kpi .label {
-      color:var(--muted);
-      font-size:13px;
+    .sync{
+      margin-top:14px;
     }
-
-    .kpi .value {
-      font-size:28px;
-      font-weight:800;
-      margin-top:6px;
-    }
-
-    .kpi .hint {
-      margin-top:4px;
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .owner {
+    .sync .title{
       font-size:18px;
       font-weight:800;
     }
-
-    .meta,.small {
+    .meta{
       color:var(--muted);
       font-size:13px;
       line-height:1.45;
     }
-
-    .small { font-size:12px; }
-
-    .topline {
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:flex-start;
+    .section-title{
+      font-size:18px;
+      font-weight:800;
+      margin:18px 0 12px;
     }
-
-    .bar {
-      height:10px;
-      background:#eee6d6;
-      border-radius:999px;
-      overflow:hidden;
-    }
-
-    .bar > span {
-      display:block;
-      height:100%;
-      border-radius:999px;
-      background:linear-gradient(90deg,var(--gold),var(--gold2));
-    }
-
-    .tag {
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:12px;
-      font-weight:700;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .tag.ok { background:var(--okBg); color:var(--ok); }
-    .tag.warn { background:var(--warnBg); color:var(--warn); }
-    .tag.danger { background:var(--dangerBg); color:var(--danger); }
-    .tag.info { background:#e9f4ff; color:#285c8d; }
-
-    .building-grid {
+    .grid{
       display:grid;
       grid-template-columns:repeat(2,1fr);
-      gap:10px;
+      gap:12px;
     }
-
-    .building-tile { cursor:pointer; }
-
-    .street-title {
+    .kpi .label{
+      color:var(--muted);
+      font-size:13px;
+    }
+    .kpi .value{
+      font-size:28px;
+      font-weight:800;
+      margin-top:6px;
+    }
+    .kpi .hint{
+      margin-top:4px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .street-wrap{
+      margin-bottom:18px;
+    }
+    .street-title{
       font-size:16px;
       font-weight:800;
       margin:0 0 10px;
       color:#7a5a17;
     }
-
-    .building-selects {
+    .building-grid{
       display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-top:12px;
-    }
-
-    .select-wrap {
-      background:#fffdfa;
-      border-radius:18px;
-      padding:12px;
-      box-shadow:var(--shadow);
-    }
-
-    .select-wrap select {
-      width:100%;
-      border:none;
-      background:#f9f6ef;
-      border-radius:14px;
-      padding:12px;
-      font-size:14px;
-    }
-
-    .toolbar {
-      display:flex;
+      grid-template-columns:repeat(2,1fr);
       gap:10px;
-      margin-bottom:12px;
     }
-
-    .search {
-      flex:1;
-      border:none;
-      background:white;
-      border-radius:16px;
-      padding:13px 14px;
-      box-shadow:var(--shadow);
-      font-size:14px;
-    }
-
-    .chips {
-      display:flex;
-      gap:8px;
-      overflow:auto;
-      padding-bottom:4px;
-      scrollbar-width:none;
-    }
-
-    .chip {
-      white-space:nowrap;
-      border:none;
-      cursor:pointer;
-      background:#fff;
-      color:var(--text);
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:700;
-      box-shadow:var(--shadow);
-    }
-
-    .chip.active {
-      background:var(--gold);
-      color:#fff;
-    }
-
-    .resident-card {
-      margin-bottom:12px;
+    .building{
       cursor:pointer;
     }
-
-    .note {
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.55;
-    }
-
-    .tags {
+    .building-top{
       display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-      margin:10px 0;
-    }
-
-    .row-actions {
-      display:flex;
-      gap:10px;
-      margin-top:12px;
-    }
-
-    .quick-actions {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-
-    .detail-grid {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .breadcrumb {
-      color:var(--muted);
-      font-size:13px;
-      margin-bottom:10px;
-    }
-
-    .hidden { display:none !important; }
-
-    .nav {
-      position:fixed;
-      bottom:0;
-      left:0;
-      right:0;
-      background:rgba(255,253,248,.94);
-      backdrop-filter:blur(8px);
-      border-top:1px solid #e8e0d0;
-      padding:10px 14px;
-    }
-
-    .nav-inner {
-      max-width:470px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:8px;
-    }
-
-    .nav-btn {
-      border:none;
-      background:none;
-      border-radius:16px;
-      padding:10px 6px;
-      color:#7a7467;
-      font-weight:700;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:5px;
-      cursor:pointer;
-    }
-
-    .nav-btn.active {
-      background:#fff;
-      box-shadow:var(--shadow);
-      color:#1f2937;
-    }
-
-    .dot {
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      margin-top:6px;
-      flex:0 0 auto;
-    }
-
-    .insight {
-      display:flex;
-      gap:10px;
       align-items:flex-start;
-      background:linear-gradient(180deg,#fff,#fffaf0);
-      margin-bottom:10px;
+      justify-content:space-between;
+      gap:10px;
     }
-
-    .status-dot {
+    .building-name{
+      font-size:18px;
+      font-weight:800;
+    }
+    .status-dot{
       width:14px;
       height:14px;
       border-radius:50%;
-      flex:0 0 auto;
       margin-top:3px;
+      flex:0 0 auto;
     }
-
-    .status-dot.ok { background:var(--ok); }
-    .status-dot.warn { background:var(--warn); }
-    .status-dot.danger { background:var(--danger); }
+    .status-dot.ok{background:var(--ok)}
+    .status-dot.warn{background:var(--warn)}
+    .status-dot.danger{background:var(--danger)}
+    .bar{
+      height:10px;
+      background:#eee6d6;
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .bar > span{
+      display:block;
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg,var(--gold),var(--gold2));
+    }
+    .insight{
+      margin-bottom:10px;
+    }
+    .error-box{
+      background:#fde8e6;
+      color:#a33a31;
+      border:1px solid #efcbc6;
+      padding:12px;
+      border-radius:14px;
+      white-space:pre-wrap;
+      font-size:13px;
+      line-height:1.45;
+    }
+    .hidden{display:none!important}
   </style>
 </head>
 <body>
   <div class="app">
-    <header>
-      <div class="hero">
-        <div class="kicker">פרויקט ניקנור וחננאל</div>
-        <h1>ממשק ניהול מובייל</h1>
-        <div class="sub">סנכרון חי מהטבלאות, חלוקה לרחוב → בניין → דייר → כרטיס מלא.</div>
-        <div class="actions">
-          <button class="btn primary" onclick="manualReload()">טען נתונים עכשיו</button>
-          <a class="btn secondary" href="https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing" target="_blank" rel="noopener">פתח Sheets</a>
-        </div>
+    <div class="hero">
+      <div class="kicker">פרויקט ניקנור וחננאל</div>
+      <h1>ממשק ניהול מובייל</h1>
+      <div class="sub">טעינה חיה מהטבלה, סטטיסטיקה ראשית, ומצב בניינים בצבעים לפי אחוז חתימה.</div>
+      <div class="actions">
+        <button class="btn primary" onclick="manualReload()">טען נתונים עכשיו</button>
+        <a class="btn secondary" href="https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing" target="_blank" rel="noopener">פתח Sheets</a>
       </div>
-    </header>
-
-    <div class="banner" id="data-banner">טוען נתונים...</div>
-
-    <section id="dashboard-tab">
-      <div class="card">
-        <div class="topline">
-          <div>
-            <div class="owner" style="font-size:17px;">סנכרון נתונים</div>
-            <div class="meta" id="sync-status">מתחילה טעינה אוטומטית.</div>
-          </div>
-          <span class="tag info" id="sync-badge">טוען...</span>
-        </div>
-      </div>
-
-      <div class="section-title">תמונת מצב</div>
-     <div class="grid">
-  <div class="card kpi">
-    <div class="label">סה״כ יחידות במתחם</div>
-    <div class="value" id="kpi-buildings">123</div>
-    <div class="hint">לפי הספירה שסוכמה</div>
-  </div>
-
-  <div class="card kpi">
-    <div class="label">סה״כ חתימות</div>
-    <div class="value" id="kpi-total-signatures">0</div>
-    <div class="hint">מספר חתימות בפועל</div>
-  </div>
-
-  <div class="card kpi">
-    <div class="label">אחוז חתימה מכלל המתחם</div>
-    <div class="value" id="kpi-signature-rate">0%</div>
-    <div class="hint">סך החתימות אל מול 123 דירות</div>
-      </div>
-
-      <div class="section-title">מצב בניינים גרפי</div>
-      <div class="card" id="buildings-progress"></div>
-
-      <div class="section-title">תובנות מיידיות</div>
-      <div id="quick-insights"></div>
-    </section>
-
-    <section id="residents-tab" class="hidden">
-      <div class="section-title">רשימת דיירים</div>
-      <div class="breadcrumb" id="residents-breadcrumb">רחוב → בניין → דייר → כרטיס מלא</div>
-
-      <div class="row-actions hidden" id="residents-back">
-        <button class="btn ghost" onclick="undoView()">↩ Undo</button>
-      </div>
-
-      <div class="toolbar">
-        <input id="searchInput" class="search" placeholder="חיפוש לפי שם, בניין, טלפון, הערה..." oninput="renderHierarchy()" />
-      </div>
-
-      <div class="chips">
-        <button class="chip active" data-filter="all" onclick="setFilter('all', event)">הכל</button>
-        <button class="chip" data-filter="signed" onclick="setFilter('signed', event)">חתומים</button>
-        <button class="chip" data-filter="opponents" onclick="setFilter('opponents', event)">מתנגדים</button>
-        <button class="chip" data-filter="missingPhone" onclick="setFilter('missingPhone', event)">חסרי טלפון</button>
-      </div>
-
-      <div id="residents-list" style="margin-top:12px;"></div>
-    </section>
-
-    <section id="detail-tab" class="hidden">
-      <div class="section-title">כרטיס דייר מלא</div>
-      <div class="row-actions">
-        <button class="btn ghost" onclick="undoView()">↩ Undo</button>
-      </div>
-      <div id="detail-card"></div>
-    </section>
-
-    <section id="insights-tab" class="hidden">
-      <div class="section-title">תובנות בכל הרמות</div>
-      <div id="insights-content"></div>
-    </section>
-
-    <section id="settings-tab" class="hidden">
-      <div class="section-title">הגדרות ומידע</div>
-      <div class="card">
-        <div class="owner">גרסה מוכנה ל-GitHub</div>
-        <div class="meta" style="margin-top:8px;">אם הטעינה החיה נכשלת, המערכת מציגה נתוני גיבוי כדי שלא יהיה מסך ריק.</div>
-        <div class="quick-actions">
-          <button class="btn primary" onclick="manualReload()">טען מחדש</button>
-          <a class="btn secondary" href="https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing" target="_blank" rel="noopener">פתח Sheet</a>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <nav class="nav">
-    <div class="nav-inner">
-      <button class="nav-btn active" data-tab="dashboard" onclick="showTab('dashboard')">
-        <span>🏠</span><span>דשבורד</span>
-      </button>
-      <button class="nav-btn" data-tab="residents" onclick="resetHierarchy(); showTab('residents'); renderHierarchy();">
-        <span>🏢</span><span>דיירים</span>
-      </button>
-      <button class="nav-btn" data-tab="insights" onclick="showTab('insights')">
-        <span>💡</span><span>תובנות</span>
-      </button>
-      <button class="nav-btn" data-tab="settings" onclick="showTab('settings')">
-        <span>⚙️</span><span>הגדרות</span>
-      </button>
+      <div class="banner" id="banner">טוען נתונים...</div>
     </div>
-  </nav>
+
+    <div class="card sync">
+      <div class="title">סנכרון נתונים</div>
+      <div class="meta" id="syncStatus">המערכת מנסה לטעון נתונים.</div>
+    </div>
+
+    <div class="section-title">תמונת מצב</div>
+    <div class="grid">
+      <div class="card kpi">
+        <div class="label">סה״כ יחידות במתחם</div>
+        <div class="value" id="kpiUnits">123</div>
+        <div class="hint">לפי הספירה שסוכמה</div>
+      </div>
+
+      <div class="card kpi">
+        <div class="label">סה״כ חתימות</div>
+        <div class="value" id="kpiSignatures">0</div>
+        <div class="hint">מספר חתימות בפועל</div>
+      </div>
+
+      <div class="card kpi">
+        <div class="label">אחוז חתימה מכלל המתחם</div>
+        <div class="value" id="kpiPercent">0%</div>
+        <div class="hint">סך החתימות אל מול 123 דירות</div>
+      </div>
+    </div>
+
+    <div class="section-title">מצב בניינים גרפי</div>
+    <div id="buildingsContainer"></div>
+
+    <div class="section-title">אבחון טעינה</div>
+    <div id="errorContainer" class="hidden"></div>
+  </div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzWmJ16e1PEaYCsh_A6iQoC8fxFU_LGApJRzlLMPnkzPR-cZmmRUCT5cgZHOWxt3PP1/exec";
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing";
-    const TOTAL_UNITS_IN_COMPLEX = 123;
-
+    const TOTAL_UNITS = 123;
     let apartments = [];
-    let fallbackRows = [];
-    let currentFilter = "all";
-    let currentStreet = null;
-    let currentBuilding = null;
-    let currentResidentKey = null;
-    const viewHistory = [];
 
-    function setBanner(message, tone = "info") {
-      const el = document.getElementById("data-banner");
-      el.textContent = message;
-      el.style.background = tone === "ok" ? "#eef9f0" : tone === "danger" ? "#fde8e6" : "#fff8df";
-      el.style.borderColor = tone === "ok" ? "#cbe7d1" : tone === "danger" ? "#efcbc6" : "#f1deaa";
-      el.style.color = tone === "ok" ? "#256b39" : tone === "danger" ? "#a33a31" : "#7a5a17";
+    function setBanner(text, type = "info") {
+      const el = document.getElementById("banner");
+      el.textContent = text;
+      if (type === "ok") {
+        el.style.background = "#eef9f0";
+        el.style.borderColor = "#cbe7d1";
+        el.style.color = "#256b39";
+      } else if (type === "danger") {
+        el.style.background = "#fde8e6";
+        el.style.borderColor = "#efcbc6";
+        el.style.color = "#a33a31";
+      } else {
+        el.style.background = "#fff8df";
+        el.style.borderColor = "#f1deaa";
+        el.style.color = "#7a5a17";
+      }
     }
 
-    function setSyncStatus(text, badge = "טוען...", tone = "info") {
-      document.getElementById("sync-status").textContent = text;
-      const chip = document.getElementById("sync-badge");
-      chip.textContent = badge;
-      chip.className = "tag " + (tone === "ok" ? "ok" : tone === "danger" ? "danger" : "info");
+    function setSyncStatus(text) {
+      document.getElementById("syncStatus").textContent = text;
     }
 
-    function syncTimestamp() {
-      return new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+    function showError(text) {
+      const box = document.getElementById("errorContainer");
+      box.classList.remove("hidden");
+      box.innerHTML = `<div class="error-box">${escapeHtml(text)}</div>`;
     }
 
-    function normalizedStreet(item) {
-      return item.source || "לא ידוע";
+    function hideError() {
+      document.getElementById("errorContainer").classList.add("hidden");
+      document.getElementById("errorContainer").innerHTML = "";
     }
 
-    function normalizeApiRow(row) {
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function normalizeRow(row) {
       return {
         source: row.source || "",
         owner: row.owner || "",
@@ -566,114 +298,42 @@
         floor: String(row.floor || "").trim(),
         unit: String(row.unit || "").trim(),
         notes: row.notes || "",
-        signed: !!row.signed,
-        interest: row.interest || ""
+        signed: !!row.signed
       };
     }
 
-    function hasSignatureMarker(item) {
+    function hasSignature(item) {
       return item.signed === true || String(item.notes || "").includes("חתום");
     }
 
-    function residentKey(a) {
-      return [normalizedStreet(a), a.building || "", a.unit || "", a.owner || "", a.phone || ""].join("|");
+    function totalSignaturesCount() {
+      return apartments.filter(hasSignature).length;
     }
 
-    function pushViewState() {
-      viewHistory.push({
-        street: currentStreet,
-        building: currentBuilding,
-        residentKey: currentResidentKey,
-        tab: currentResidentKey ? "detail" : "residents"
-      });
-      document.getElementById("residents-back").classList.remove("hidden");
-    }
-
-    function resetHierarchy() {
-      currentStreet = null;
-      currentBuilding = null;
-      currentResidentKey = null;
-      viewHistory.length = 0;
-      document.getElementById("residents-back").classList.add("hidden");
-    }
-
-    function undoView() {
-      const prev = viewHistory.pop();
-      if (prev) {
-        currentStreet = prev.street;
-        currentBuilding = prev.building;
-        currentResidentKey = prev.residentKey;
-        showTab(prev.tab || (prev.residentKey ? "detail" : "residents"));
-      } else {
-        resetHierarchy();
-        showTab("residents");
-      }
-      if (!viewHistory.length) {
-        document.getElementById("residents-back").classList.add("hidden");
-      }
-      renderHierarchy();
-    }
-
-    function openBuilding(street, building) {
-      pushViewState();
-      currentStreet = street;
-      currentBuilding = String(building);
-      currentResidentKey = null;
-      showTab("residents");
-      renderHierarchy();
-    }
-
-    function openResident(key) {
-      pushViewState();
-      currentResidentKey = key;
-      showTab("detail");
-      renderHierarchy();
-    }
-
-    function statusClass(a) {
-      if (hasSignatureMarker(a)) return "ok";
-      const txt = `${a.interest || ""} ${a.notes || ""}`;
-      if (txt.includes("מתנגד") || txt.includes("לא מעונ")) return "danger";
-      return "warn";
-    }
-
-    function statusLabel(a) {
-      if (hasSignatureMarker(a)) return "חתום";
-      const txt = `${a.interest || ""} ${a.notes || ""}`;
-      if (txt.includes("מתנגד") || txt.includes("לא מעונ")) return "מתנגד";
-      return "בטיפול";
+    function overallPercent() {
+      const total = totalSignaturesCount();
+      return TOTAL_UNITS ? Math.round((total / TOTAL_UNITS) * 100) : 0;
     }
 
     function getBuildingStats() {
       const groups = {};
 
       apartments.forEach(item => {
-        const street = normalizedStreet(item);
+        const street = item.source || "לא ידוע";
         const building = String(item.building || "").trim();
         if (!building) return;
 
         const key = street + "|" + building;
         if (!groups[key]) {
-          groups[key] = {
-            street,
-            building,
-            items: []
-          };
+          groups[key] = { street, building, items: [] };
         }
-
         groups[key].items.push(item);
       });
 
       return Object.values(groups)
         .map(g => {
           const total = g.items.length;
-          const signedCount = g.items.filter(hasSignatureMarker).length;
-          const missing = g.items.filter(i => !i.phone).length;
-          const opp = g.items.filter(i => {
-            const txt = `${i.interest || ""} ${i.notes || ""}`;
-            return txt.includes("מתנגד") || txt.includes("לא מעונ");
-          }).length;
-
+          const signedCount = g.items.filter(hasSignature).length;
           const pct = total ? Math.round((signedCount / total) * 100) : 0;
 
           let status = "danger";
@@ -687,8 +347,6 @@
             ...g,
             total,
             signedCount,
-            missing,
-            opp,
             pct,
             status
           };
@@ -699,423 +357,93 @@
         );
     }
 
-    function getStreetBuildingStats(street) {
-      return getBuildingStats().filter(b => b.street === street);
+    function renderKPIs() {
+      document.getElementById("kpiUnits").textContent = TOTAL_UNITS;
+      document.getElementById("kpiSignatures").textContent = totalSignaturesCount();
+      document.getElementById("kpiPercent").textContent = overallPercent() + "%";
     }
 
-    function totalSignaturesCount() {
-      return apartments.filter(hasSignatureMarker).length;
-    }
-
-    function overallSignaturePct() {
-      const signedRows = totalSignaturesCount();
-      return TOTAL_UNITS_IN_COMPLEX
-        ? Math.round((signedRows / TOTAL_UNITS_IN_COMPLEX) * 100)
-        : 0;
-    }
-
-    function applyFilter(item) {
-      if (currentFilter === "signed") return hasSignatureMarker(item);
-      const txt = `${item.interest || ""} ${item.notes || ""}`;
-      if (currentFilter === "opponents") return txt.includes("מתנגד") || txt.includes("לא מעונ");
-      if (currentFilter === "missingPhone") return !item.phone;
-      return true;
-    }
-
-    function getFilteredApartments() {
-      const q = (document.getElementById("searchInput")?.value || "").trim();
-      return apartments.filter(applyFilter).filter(a => {
-        if (!q) return true;
-        const hay = [a.owner, a.phone, a.building, a.floor, a.unit, a.notes, a.source].join(" ");
-        return hay.includes(q);
-      });
-    }
-
-    function setFilter(filter, event) {
-      currentFilter = filter;
-      document.querySelectorAll(".chip").forEach(el => el.classList.remove("active"));
-      if (event && event.currentTarget) event.currentTarget.classList.add("active");
-      renderHierarchy();
-    }
-function fillKPIs() {
-  const totalSignatures = totalSignaturesCount();
-
-  document.getElementById("kpi-buildings").textContent = TOTAL_UNITS_IN_COMPLEX;
-  document.getElementById("kpi-total-signatures").textContent = totalSignatures;
-  document.getElementById("kpi-signature-rate").textContent = overallSignaturePct() + "%";
-}
-    }
-
-    function renderQuickInsights() {
+    function renderBuildings() {
+      const container = document.getElementById("buildingsContainer");
       const buildings = getBuildingStats();
-      const greenBuildings = buildings.filter(b => b.status === "ok").length;
-      const orangeBuildings = buildings.filter(b => b.status === "warn").length;
-      const redBuildings = buildings.filter(b => b.status === "danger").length;
-      const missingPhone = apartments.filter(a => !a.phone).length;
-      const noNotes = apartments.filter(a => !(a.notes || "").trim()).length;
-      const totalSignedRows = totalSignaturesCount();
-
-      document.getElementById("quick-insights").innerHTML = `
-        <div class="card insight">
-          <span class="dot" style="background:#7fb18a"></span>
-          <div>יש כרגע <b>${totalSignedRows}</b> חתימות מתוך 123 דירות, שהן <b>${overallSignaturePct()}%</b> מכלל המתחם.</div>
-        </div>
-
-        <div class="card insight">
-          <span class="dot" style="background:#7fb18a"></span>
-          <div><b>${greenBuildings}</b> בניינים בירוק, <b>${orangeBuildings}</b> בכתום, <b>${redBuildings}</b> באדום.</div>
-        </div>
-
-        <div class="card insight">
-          <span class="dot" style="background:#e67b73"></span>
-          <div>יש <b>${missingPhone}</b> רשומות ללא טלפון.</div>
-        </div>
-
-        <div class="card insight">
-          <span class="dot" style="background:#f0a95b"></span>
-          <div>יש <b>${noNotes}</b> רשומות ללא הערה.</div>
-        </div>
-      `;
-    }
-
-    function buildingDotClass(b) {
-      return b.status === "ok" ? "ok" : b.status === "warn" ? "warn" : "danger";
-    }
-
-    function renderBuildingProgress() {
-      const box = document.getElementById("buildings-progress");
       const streets = ["ניקנור", "חננאל"];
 
-      box.innerHTML = streets.map(street => {
-        const rows = getStreetBuildingStats(street);
+      container.innerHTML = streets.map(street => {
+        const rows = buildings.filter(b => b.street === street);
         return `
-          <div style="margin-bottom:18px;">
+          <div class="street-wrap">
             <div class="street-title">${street}</div>
             <div class="building-grid">
               ${
-                rows.map(b => `
-                  <div class="card building-tile" onclick="openBuilding('${street}','${String(b.building).replace(/'/g, "&#39;")}')">
-                    <div class="topline">
-                      <div class="owner">בניין ${b.building}</div>
-                      <span class="status-dot ${buildingDotClass(b)}"></span>
+                rows.length
+                  ? rows.map(b => `
+                    <div class="card building">
+                      <div class="building-top">
+                        <div class="building-name">בניין ${b.building}</div>
+                        <span class="status-dot ${b.status}"></span>
+                      </div>
+                      <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
+                      <div class="bar"><span style="width:${b.pct}%"></span></div>
                     </div>
-                    <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
-                    <div class="bar" style="margin:10px 0 8px;"><span style="width:${b.pct}%"></span></div>
-                  </div>
-                `).join("") || `<div class="card">אין נתונים ל-${street}</div>`
+                  `).join("")
+                  : `<div class="card"><div class="meta">אין נתונים ל-${street}</div></div>`
               }
             </div>
           </div>
         `;
-      }).join("") + `
-        <div class="building-selects">
-          ${["ניקנור", "חננאל"].map(street => {
-            const rows = getStreetBuildingStats(street);
-            return `
-              <div class="select-wrap">
-                <div class="owner" style="font-size:16px;">בחירת בניין ${street}</div>
-                <div class="small" style="margin:6px 0 10px;">רשימת גלילה מהירה</div>
-                <select onchange="if(this.value) openBuilding('${street}', this.value)">
-                  <option value="">בחר בניין</option>
-                  ${rows.map(b => `<option value="${b.building}">בניין ${b.building} · ${b.pct}%</option>`).join("")}
-                </select>
-              </div>
-            `;
-          }).join("")}
-        </div>
-      `;
-    }
-
-    function renderResidentList(list, street, building) {
-      return list.map(a => `
-        <div class="card resident-card" onclick="openResident('${residentKey(a).replace(/'/g, "&#39;")}')">
-          <div class="topline">
-            <div>
-              <div class="owner">${a.owner || "ללא שם"}</div>
-              <div class="meta">${street} · בניין ${building} · קומה ${a.floor || "-"} · דירה פנימית ${a.unit || "-"}</div>
-            </div>
-            <span class="tag ${statusClass(a)}">${statusLabel(a)}</span>
-          </div>
-          <div class="meta" style="margin-top:8px;"><strong>טלפון:</strong> ${a.phone || "לא קיים"}</div>
-          <div class="note" style="margin-top:8px;"><strong>הערה:</strong> ${a.notes || "אין הערה"}</div>
-          <div class="row-actions">
-            ${a.phone ? `<a class="btn primary" href="tel:${String(a.phone).replace(/[^\d+]/g,'')}" onclick="event.stopPropagation()">חיוג</a>` : `<button class="btn primary" disabled>אין טלפון</button>`}
-            <button class="btn secondary" onclick="event.stopPropagation(); openResident('${residentKey(a).replace(/'/g, "&#39;")}')">כרטיס מלא</button>
-          </div>
-        </div>
-      `).join("");
-    }
-
-    function renderResidentDetail(item) {
-      const box = document.getElementById("detail-card");
-      if (!item) {
-        box.innerHTML = `<div class="card">לא נמצא דייר.</div>`;
-        return;
-      }
-
-      box.innerHTML = `
-        <div class="card">
-          <div class="topline">
-            <div>
-              <div class="owner" style="font-size:22px;">${item.owner || "ללא שם"}</div>
-              <div class="meta">${normalizedStreet(item)} → בניין ${item.building || "-"} → קומה ${item.floor || "-"} → דירה פנימית ${item.unit || "-"}</div>
-            </div>
-            <span class="tag ${statusClass(item)}">${statusLabel(item)}</span>
-          </div>
-
-          <div class="tags">
-            ${item.phone ? '<span class="tag info">יש טלפון</span>' : '<span class="tag danger">חסר טלפון</span>'}
-            ${hasSignatureMarker(item) ? '<span class="tag ok">רשומה חתומה</span>' : '<span class="tag warn">רשומה לא חתומה</span>'}
-          </div>
-
-          <div class="detail-grid" style="margin-top:12px;">
-            <div class="card">
-              <div class="small">טלפון</div>
-              <div class="owner" style="font-size:18px;">${item.phone || "לא קיים"}</div>
-            </div>
-            <div class="card">
-              <div class="small">רחוב / בניין</div>
-              <div class="owner" style="font-size:18px;">${normalizedStreet(item)} ${item.building || "-"}</div>
-            </div>
-            <div class="card">
-              <div class="small">קומה</div>
-              <div class="owner" style="font-size:18px;">${item.floor || "-"}</div>
-            </div>
-            <div class="card">
-              <div class="small">דירה פנימית</div>
-              <div class="owner" style="font-size:18px;">${item.unit || "-"}</div>
-            </div>
-          </div>
-
-          <div class="card" style="margin-top:12px;">
-            <div class="small">הערות</div>
-            <div style="margin-top:8px;line-height:1.6">${item.notes || "אין הערות"}</div>
-          </div>
-
-          <div class="quick-actions">
-            ${item.phone ? `<a class="btn primary" href="tel:${String(item.phone).replace(/[^\d+]/g,'')}">חיוג מהיר</a>` : `<button class="btn primary" disabled>אין טלפון</button>`}
-            <a class="btn secondary" href="${SHEET_URL}" target="_blank" rel="noopener">פתח Sheet</a>
-            <button class="btn ghost" onclick="undoView()">↩ Undo</button>
-            <button class="btn ghost" onclick="currentResidentKey=null; showTab('residents'); renderHierarchy();">חזרה לדיירים</button>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderHierarchy() {
-      const list = document.getElementById("residents-list");
-      const crumb = document.getElementById("residents-breadcrumb");
-      let filtered = getFilteredApartments();
-
-      if (currentResidentKey) {
-        const item = apartments.find(a => residentKey(a) === currentResidentKey);
-        renderResidentDetail(item);
-        return;
-      }
-
-      if (!currentStreet && !currentBuilding) {
-        crumb.textContent = "רחוב → בניין → דייר → כרטיס מלא";
-        list.innerHTML = ["ניקנור", "חננאל"].map(street => {
-          const rows = getStreetBuildingStats(street);
-          return `
-            <div style="margin-bottom:18px;">
-              <div class="street-title">${street}</div>
-              ${
-                rows.map(b => `
-                  <div class="card resident-card" onclick="openBuilding('${street}','${String(b.building).replace(/'/g, "&#39;")}')">
-                    <div class="topline">
-                      <div>
-                        <div class="owner">בניין ${b.building}</div>
-                        <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
-                      </div>
-                      <span class="status-dot ${buildingDotClass(b)}"></span>
-                    </div>
-                    <div class="bar" style="margin-top:10px;"><span style="width:${b.pct}%"></span></div>
-                  </div>
-                `).join("")
-              }
-            </div>
-          `;
-        }).join("");
-        return;
-      }
-
-      if (currentStreet) {
-        filtered = filtered.filter(a => normalizedStreet(a) === currentStreet);
-      }
-
-      if (currentBuilding) {
-        filtered = filtered.filter(a => String(a.building || "") === String(currentBuilding));
-      }
-
-      crumb.textContent = currentBuilding
-        ? `${currentStreet} → בניין ${currentBuilding} → דיירים`
-        : `${currentStreet} → בניינים`;
-
-      if (!currentBuilding) {
-        const rows = getStreetBuildingStats(currentStreet);
-        list.innerHTML = rows.map(b => `
-          <div class="card resident-card" onclick="openBuilding('${currentStreet}','${String(b.building).replace(/'/g, "&#39;")}')">
-            <div class="topline">
-              <div>
-                <div class="owner">בניין ${b.building}</div>
-                <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
-              </div>
-              <span class="status-dot ${buildingDotClass(b)}"></span>
-            </div>
-            <div class="bar" style="margin-top:10px;"><span style="width:${b.pct}%"></span></div>
-          </div>
-        `).join("");
-        return;
-      }
-
-      if (!filtered.length) {
-        list.innerHTML = `<div class="card">לא נמצאו דיירים לבניין זה.</div>`;
-        return;
-      }
-
-      list.innerHTML = renderResidentList(filtered, currentStreet, currentBuilding);
-    }
-
-    function renderInsights() {
-      const box = document.getElementById("insights-content");
-      const buildings = getBuildingStats();
-      const totalSignedRows = totalSignaturesCount();
-      const projectPct = overallSignaturePct();
-      const weakBuildings = buildings.filter(b => b.pct < 100 || b.missing > 0 || b.opp > 0);
-
-      box.innerHTML = `
-        <div class="card" style="margin-bottom:12px;">
-          <div class="owner">רמת פרויקט</div>
-          <div class="meta" style="margin-top:8px;">אחוז חתימה מכלל המתחם: <b>${projectPct}%</b></div>
-          <div class="meta">סה״כ חתימות בפועל: <b>${totalSignedRows}</b></div>
-          <div class="meta">סה״כ יחידות במתחם: <b>${TOTAL_UNITS_IN_COMPLEX}</b></div>
-        </div>
-
-        ${["ניקנור", "חננאל"].map(street => {
-          const rows = getStreetBuildingStats(street);
-          return `
-            <div class="card" style="margin-bottom:12px;">
-              <div class="owner">${street}</div>
-              <div class="meta" style="margin-top:8px;">בניינים מזוהים ברחוב: <b>${rows.length}</b></div>
-              <div class="meta">ממוצע חתימה ברחוב: <b>${rows.length ? Math.round(rows.reduce((s, r) => s + r.pct, 0) / rows.length) : 0}%</b></div>
-            </div>
-          `;
-        }).join("")}
-
-        <div class="section-title">מוקדי טיפול ברמת בניין</div>
-        ${
-          weakBuildings.map(b => `
-            <div class="card" style="margin-bottom:10px;">
-              <div class="topline">
-                <div>
-                  <div class="owner">${b.street} · בניין ${b.building}</div>
-                  <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
-                </div>
-                <span class="status-dot ${buildingDotClass(b)}"></span>
-              </div>
-              <div class="note" style="margin-top:8px;">
-                ${b.pct < 100 ? "הבניין עדיין לא הושלם בחתימות. " : ""}
-                ${b.missing > 0 ? `יש ${b.missing} רשומות ללא טלפון. ` : ""}
-                ${b.opp > 0 ? `יש ${b.opp} מוקדי התנגדות או אי-עניין. ` : ""}
-              </div>
-            </div>
-          `).join("") || `<div class="card">אין כרגע מוקדי חריגה בולטים.</div>`
-        }
-      `;
-    }
-
-    function showTab(tab) {
-      ["dashboard", "residents", "detail", "insights", "settings"].forEach(name => {
-        document.getElementById(name + "-tab").classList.toggle("hidden", name !== tab);
-      });
-      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      }).join("");
     }
 
     function rerenderAll() {
-      fillKPIs();
-      renderQuickInsights();
-      renderBuildingProgress();
-      renderHierarchy();
-      renderInsights();
+      renderKPIs();
+      renderBuildings();
     }
 
-    async function loadLiveData() {
-      setBanner("טוען נתונים אוטומטית מה-API...", "info");
-      setSyncStatus("מתבצעת טעינה אוטומטית מה-API.", "טוען...", "info");
+    async function loadData() {
+      hideError();
+      setBanner("טוען נתונים...", "info");
+      setSyncStatus("מנסה להתחבר לשרת הנתונים.");
 
-      const res = await fetch(API_URL, { cache: "no-store" });
-      if (!res.ok) throw new Error("API failed");
-
-      const payload = await res.json();
-      if (!payload || payload.success !== true || !Array.isArray(payload.data)) {
-        throw new Error("Invalid payload");
-      }
-
-      apartments = payload.data.map(normalizeApiRow).filter(r =>
-        r.owner || r.phone || r.building || r.notes
-      );
-
-      if (!apartments.length) {
-        throw new Error("No rows from API");
-      }
-
-      setBanner(`נטענו ${apartments.length} רשומות חיות מה-API.`, "ok");
-      setSyncStatus(`הנתונים החיים נטענו בהצלחה בשעה ${syncTimestamp()}.`, "חי", "ok");
-    }
-
-    async function loadFallbackData() {
       try {
-        const res = await fetch(API_URL, { cache: "no-store" });
-        if (!res.ok) throw new Error("No fallback fetch");
+        const res = await fetch(API_URL, {
+          method: "GET",
+          cache: "no-store",
+          redirect: "follow"
+        });
+
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+
         const payload = await res.json();
-        if (payload && Array.isArray(payload.data)) {
-          fallbackRows = payload.data.map(normalizeApiRow);
-        }
-      } catch (e) {
-        fallbackRows = [];
-      }
-    }
 
-    async function manualReload() {
-      try {
-        await loadLiveData();
+        if (!payload || payload.success !== true || !Array.isArray(payload.data)) {
+          throw new Error("מבנה תשובה לא תקין מהשרת");
+        }
+
+        apartments = payload.data.map(normalizeRow).filter(r =>
+          r.owner || r.phone || r.building || r.notes
+        );
+
+        rerenderAll();
+        setBanner(`נטענו ${apartments.length} רשומות בהצלחה.`, "ok");
+        setSyncStatus("הטעינה הצליחה.");
       } catch (err) {
-        console.error(err);
-        if (fallbackRows.length) {
-          apartments = [...fallbackRows];
-        }
-        setBanner("הטעינה היזומה נכשלה. מוצגים נתוני גיבוי.", "danger");
-        setSyncStatus("הטעינה היזומה נכשלה. מוצגים נתוני גיבוי.", "גיבוי", "danger");
+        setBanner("הטעינה נכשלה.", "danger");
+        setSyncStatus("לא הצלחנו למשוך נתונים מהטבלה.");
+        showError(
+          "הודעת שגיאה:\n" +
+          (err && err.message ? err.message : String(err)) +
+          "\n\nאם זה קורה רק בנייד, לרוב זו חסימת fetch בין GitHub ל-Apps Script."
+        );
       }
-      rerenderAll();
     }
 
-    async function initApp() {
-      await loadFallbackData();
-
-      if (fallbackRows.length) {
-        apartments = [...fallbackRows];
-      }
-
-      rerenderAll();
-
-      try {
-        await loadLiveData();
-      } catch (err) {
-        console.error(err);
-        if (fallbackRows.length) {
-          apartments = [...fallbackRows];
-        }
-        setBanner("לא ניתן היה לטעון כרגע נתונים חיים. מוצגים נתוני גיבוי.", "danger");
-        setSyncStatus("טעינה אוטומטית נכשלה. מוצגים נתוני גיבוי.", "גיבוי", "danger");
-      }
-
-      rerenderAll();
+    function manualReload() {
+      loadData();
     }
 
-    initApp();
+    loadData();
   </script>
 </body>
 </html>
