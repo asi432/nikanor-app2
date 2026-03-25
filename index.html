@@ -34,7 +34,7 @@
       max-width:480px;
       margin:0 auto;
       min-height:100vh;
-      padding:16px 16px 90px;
+      padding:16px 16px 96px;
     }
     .hero{
       background:linear-gradient(135deg,#fff8ea 0%,#fff 55%,#eef6ff 100%);
@@ -77,9 +77,12 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
+      gap:8px;
     }
     .btn.primary{background:var(--gold);color:#fff}
     .btn.secondary{background:var(--blue);color:var(--blueText)}
+    .btn.ghost{background:#fff;color:var(--text);border:1px solid #ece7dc}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
     .banner{
       margin-top:14px;
       background:#fff8df;
@@ -96,18 +99,17 @@
       box-shadow:var(--shadow);
       border:1px solid rgba(31,41,55,.05);
     }
-    .sync{
-      margin-top:14px;
-    }
+    .sync{margin-top:14px}
     .sync .title{
       font-size:18px;
       font-weight:800;
     }
-    .meta{
+    .meta,.small{
       color:var(--muted);
       font-size:13px;
       line-height:1.45;
     }
+    .small{font-size:12px}
     .section-title{
       font-size:18px;
       font-weight:800;
@@ -132,9 +134,7 @@
       font-size:12px;
       color:var(--muted);
     }
-    .street-wrap{
-      margin-bottom:18px;
-    }
+    .street-wrap{margin-bottom:18px}
     .street-title{
       font-size:16px;
       font-weight:800;
@@ -149,13 +149,13 @@
     .building{
       cursor:pointer;
     }
-    .building-top{
+    .building-top,.row-top{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap:10px;
     }
-    .building-name{
+    .building-name,.owner{
       font-size:18px;
       font-weight:800;
     }
@@ -196,58 +196,226 @@
       line-height:1.45;
     }
     .hidden{display:none!important}
+    .toolbar{
+      display:flex;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .search{
+      flex:1;
+      border:none;
+      background:white;
+      border-radius:16px;
+      padding:13px 14px;
+      box-shadow:var(--shadow);
+      font-size:14px;
+    }
+    .chips{
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      padding-bottom:4px;
+      scrollbar-width:none;
+      margin-bottom:12px;
+    }
+    .chip{
+      white-space:nowrap;
+      border:none;
+      cursor:pointer;
+      background:#fff;
+      color:var(--text);
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:700;
+      box-shadow:var(--shadow);
+    }
+    .chip.active{
+      background:var(--gold);
+      color:#fff;
+    }
+    .resident-card{
+      margin-bottom:12px;
+      cursor:pointer;
+    }
+    .row-actions{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .detail-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      margin-top:8px;
+    }
+    .tag{
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .tag.ok{background:var(--okBg);color:var(--ok)}
+    .tag.warn{background:var(--warnBg);color:var(--warn)}
+    .tag.danger{background:var(--dangerBg);color:var(--danger)}
+    .breadcrumb{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:10px;
+    }
+    .nav{
+      position:fixed;
+      bottom:0;
+      left:0;
+      right:0;
+      background:rgba(255,253,248,.94);
+      backdrop-filter:blur(8px);
+      border-top:1px solid #e8e0d0;
+      padding:10px 14px;
+    }
+    .nav-inner{
+      max-width:480px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+    }
+    .nav-btn{
+      border:none;
+      background:none;
+      border-radius:16px;
+      padding:10px 6px;
+      color:#7a7467;
+      font-weight:700;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:5px;
+      cursor:pointer;
+    }
+    .nav-btn.active{
+      background:#fff;
+      box-shadow:var(--shadow);
+      color:#1f2937;
+    }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="hero">
-      <div class="kicker">פרויקט ניקנור וחננאל</div>
-      <h1>ממשק ניהול מובייל</h1>
-      <div class="sub">טעינה חיה מהטבלה, סטטיסטיקה ראשית, ומצב בניינים בצבעים לפי אחוז חתימה.</div>
-      <div class="actions">
-        <button class="btn primary" onclick="manualReload()">טען נתונים עכשיו</button>
-        <a class="btn secondary" href="https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing" target="_blank" rel="noopener">פתח Sheets</a>
-      </div>
-      <div class="banner" id="banner">טוען נתונים...</div>
-    </div>
-
-    <div class="card sync">
-      <div class="title">סנכרון נתונים</div>
-      <div class="meta" id="syncStatus">המערכת מנסה לטעון נתונים.</div>
-    </div>
-
-    <div class="section-title">תמונת מצב</div>
-    <div class="grid">
-      <div class="card kpi">
-        <div class="label">סה״כ יחידות במתחם</div>
-        <div class="value" id="kpiUnits">123</div>
-        <div class="hint">לפי הספירה שסוכמה</div>
+    <section id="tab-dashboard">
+      <div class="hero">
+        <div class="kicker">פרויקט ניקנור וחננאל</div>
+        <h1>ממשק ניהול מובייל</h1>
+        <div class="sub">טעינה חיה מהטבלה, סטטיסטיקה ראשית, ניווט בניין → דייר → כרטיס מלא, ותובנות.</div>
+        <div class="actions">
+          <button class="btn primary" onclick="manualReload()">טען נתונים עכשיו</button>
+          <a class="btn secondary" href="https://docs.google.com/spreadsheets/d/1iQRZbW1x66xi6LCzmso80a4uDUIh3mRBenh0VP9AKyc/edit?usp=sharing" target="_blank" rel="noopener">פתח Sheets</a>
+        </div>
+        <div class="banner" id="banner">טוען נתונים...</div>
       </div>
 
-      <div class="card kpi">
-        <div class="label">סה״כ חתימות</div>
-        <div class="value" id="kpiSignatures">0</div>
-        <div class="hint">מספר חתימות בפועל</div>
+      <div class="card sync">
+        <div class="title">סנכרון נתונים</div>
+        <div class="meta" id="syncStatus">המערכת מנסה לטעון נתונים.</div>
       </div>
 
-      <div class="card kpi">
-        <div class="label">אחוז חתימה מכלל המתחם</div>
-        <div class="value" id="kpiPercent">0%</div>
-        <div class="hint">סך החתימות אל מול 123 דירות</div>
+      <div class="section-title">תמונת מצב</div>
+      <div class="grid">
+        <div class="card kpi">
+          <div class="label">סה״כ יחידות במתחם</div>
+          <div class="value" id="kpiUnits">123</div>
+          <div class="hint">לפי הספירה שסוכמה</div>
+        </div>
+
+        <div class="card kpi">
+          <div class="label">סה״כ חתימות</div>
+          <div class="value" id="kpiSignatures">0</div>
+          <div class="hint">מספר חתימות בפועל</div>
+        </div>
+
+        <div class="card kpi">
+          <div class="label">אחוז חתימה מכלל המתחם</div>
+          <div class="value" id="kpiPercent">0%</div>
+          <div class="hint">סך החתימות אל מול 123 דירות</div>
+        </div>
       </div>
-    </div>
 
-    <div class="section-title">מצב בניינים גרפי</div>
-    <div id="buildingsContainer"></div>
+      <div class="section-title">מצב בניינים גרפי</div>
+      <div id="buildingsContainer"></div>
 
-    <div class="section-title">אבחון טעינה</div>
-    <div id="errorContainer" class="hidden"></div>
+      <div class="section-title">אבחון טעינה</div>
+      <div id="errorContainer" class="hidden"></div>
+    </section>
+
+    <section id="tab-residents" class="hidden">
+      <div class="section-title">דיירים ובעלים</div>
+      <div class="breadcrumb" id="breadcrumb">רחוב → בניין → דייר</div>
+      <div class="row-actions">
+        <button class="btn ghost" onclick="goBack()">חזרה</button>
+      </div>
+      <div class="toolbar">
+        <input id="searchInput" class="search" placeholder="חיפוש לפי שם, טלפון, בניין, הערה..." oninput="renderResidentsTab()" />
+      </div>
+      <div class="chips">
+        <button class="chip active" data-filter="all" onclick="setFilter('all',event)">הכל</button>
+        <button class="chip" data-filter="signed" onclick="setFilter('signed',event)">חתומים</button>
+        <button class="chip" data-filter="missingPhone" onclick="setFilter('missingPhone',event)">ללא טלפון</button>
+        <button class="chip" data-filter="opponents" onclick="setFilter('opponents',event)">מתנגדים</button>
+      </div>
+      <div id="residentsContainer"></div>
+    </section>
+
+    <section id="tab-detail" class="hidden">
+      <div class="section-title">כרטיס דייר מלא</div>
+      <div class="row-actions">
+        <button class="btn ghost" onclick="goBack()">חזרה</button>
+      </div>
+      <div id="detailContainer"></div>
+    </section>
+
+    <section id="tab-insights" class="hidden">
+      <div class="section-title">תובנות</div>
+      <div id="insightsContainer"></div>
+    </section>
   </div>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <button class="nav-btn active" data-tab="dashboard" onclick="showTab('dashboard')">
+        <span>🏠</span><span>ראשי</span>
+      </button>
+      <button class="nav-btn" data-tab="residents" onclick="resetResidentsView(); showTab('residents'); renderResidentsTab()">
+        <span>🏢</span><span>דיירים</span>
+      </button>
+      <button class="nav-btn" data-tab="insights" onclick="showTab('insights'); renderInsights()">
+        <span>💡</span><span>תובנות</span>
+      </button>
+      <button class="nav-btn" data-tab="detail" onclick="showTab('detail')">
+        <span>📄</span><span>כרטיס</span>
+      </button>
+    </div>
+  </nav>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbzWmJ16e1PEaYCsh_A6iQoC8fxFU_LGApJRzlLMPnkzPR-cZmmRUCT5cgZHOWxt3PP1/exec";
     const TOTAL_UNITS = 123;
+
     let apartments = [];
+    let currentTab = "dashboard";
+    let currentStreet = null;
+    let currentBuilding = null;
+    let currentResidentKey = null;
+    let currentFilter = "all";
+    const historyStack = [];
 
     function setBanner(text, type = "info") {
       const el = document.getElementById("banner");
@@ -278,8 +446,9 @@
     }
 
     function hideError() {
-      document.getElementById("errorContainer").classList.add("hidden");
-      document.getElementById("errorContainer").innerHTML = "";
+      const box = document.getElementById("errorContainer");
+      box.classList.add("hidden");
+      box.innerHTML = "";
     }
 
     function escapeHtml(str) {
@@ -298,12 +467,17 @@
         floor: String(row.floor || "").trim(),
         unit: String(row.unit || "").trim(),
         notes: row.notes || "",
-        signed: !!row.signed
+        signed: !!row.signed,
+        interest: row.interest || ""
       };
     }
 
     function hasSignature(item) {
       return item.signed === true || String(item.notes || "").includes("חתום");
+    }
+
+    function residentKey(a) {
+      return [a.source || "", a.building || "", a.owner || "", a.phone || "", a.unit || ""].join("|");
     }
 
     function totalSignaturesCount() {
@@ -317,16 +491,12 @@
 
     function getBuildingStats() {
       const groups = {};
-
       apartments.forEach(item => {
         const street = item.source || "לא ידוע";
         const building = String(item.building || "").trim();
         if (!building) return;
-
         const key = street + "|" + building;
-        if (!groups[key]) {
-          groups[key] = { street, building, items: [] };
-        }
+        if (!groups[key]) groups[key] = { street, building, items: [] };
         groups[key].items.push(item);
       });
 
@@ -335,21 +505,15 @@
           const total = g.items.length;
           const signedCount = g.items.filter(hasSignature).length;
           const pct = total ? Math.round((signedCount / total) * 100) : 0;
-
           let status = "danger";
-          if (pct === 100) {
-            status = "ok";
-          } else if (pct > 50) {
-            status = "warn";
-          }
-
-          return {
-            ...g,
-            total,
-            signedCount,
-            pct,
-            status
-          };
+          if (pct === 100) status = "ok";
+          else if (pct > 50) status = "warn";
+          const missing = g.items.filter(i => !i.phone).length;
+          const opp = g.items.filter(i => {
+            const txt = `${i.interest || ""} ${i.notes || ""}`;
+            return txt.includes("מתנגד") || txt.includes("לא מעונ");
+          }).length;
+          return { ...g, total, signedCount, pct, status, missing, opp };
         })
         .sort((a, b) =>
           a.street.localeCompare(b.street, "he") ||
@@ -357,7 +521,11 @@
         );
     }
 
-    function renderKPIs() {
+    function buildingDotClass(b) {
+      return b.status === "ok" ? "ok" : b.status === "warn" ? "warn" : "danger";
+    }
+
+    function fillKPIs() {
       document.getElementById("kpiUnits").textContent = TOTAL_UNITS;
       document.getElementById("kpiSignatures").textContent = totalSignaturesCount();
       document.getElementById("kpiPercent").textContent = overallPercent() + "%";
@@ -377,10 +545,10 @@
               ${
                 rows.length
                   ? rows.map(b => `
-                    <div class="card building">
+                    <div class="card building" onclick="openBuilding('${escapeJs(street)}','${escapeJs(b.building)}')">
                       <div class="building-top">
                         <div class="building-name">בניין ${b.building}</div>
-                        <span class="status-dot ${b.status}"></span>
+                        <span class="status-dot ${buildingDotClass(b)}"></span>
                       </div>
                       <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
                       <div class="bar"><span style="width:${b.pct}%"></span></div>
@@ -394,9 +562,251 @@
       }).join("");
     }
 
+    function renderInsights() {
+      const box = document.getElementById("insightsContainer");
+      const buildings = getBuildingStats();
+      const green = buildings.filter(b => b.status === "ok").length;
+      const orange = buildings.filter(b => b.status === "warn").length;
+      const red = buildings.filter(b => b.status === "danger").length;
+      const missingPhone = apartments.filter(a => !a.phone).length;
+      const noNotes = apartments.filter(a => !(a.notes || "").trim()).length;
+
+      box.innerHTML = `
+        <div class="card insight">
+          <div class="owner">תובנת על</div>
+          <div class="note">יש כרגע <b>${totalSignaturesCount()}</b> חתימות, שהן <b>${overallPercent()}%</b> מכלל המתחם.</div>
+        </div>
+        <div class="card insight">
+          <div class="owner">מפת צבעים</div>
+          <div class="note"><b>${green}</b> בניינים בירוק, <b>${orange}</b> בכתום, <b>${red}</b> באדום.</div>
+        </div>
+        <div class="card insight">
+          <div class="owner">איכות מידע</div>
+          <div class="note">יש <b>${missingPhone}</b> רשומות ללא טלפון, ו־<b>${noNotes}</b> רשומות ללא הערה.</div>
+        </div>
+        ${["ניקנור","חננאל"].map(street => {
+          const rows = buildings.filter(b => b.street === street);
+          const avg = rows.length ? Math.round(rows.reduce((s,r)=>s+r.pct,0)/rows.length) : 0;
+          return `
+            <div class="card insight">
+              <div class="owner">${street}</div>
+              <div class="note">בניינים מזוהים: <b>${rows.length}</b> · ממוצע חתימה: <b>${avg}%</b></div>
+            </div>
+          `;
+        }).join("")}
+      `;
+    }
+
+    function showTab(tab) {
+      currentTab = tab;
+      ["dashboard","residents","detail","insights"].forEach(name => {
+        document.getElementById("tab-" + name).classList.toggle("hidden", name !== tab);
+      });
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (tab === "insights") renderInsights();
+      if (tab === "residents") renderResidentsTab();
+      if (tab === "detail") renderDetailTab();
+    }
+
+    function escapeJs(str) {
+      return String(str).replaceAll("\\", "\\\\").replaceAll("'", "\\'");
+    }
+
+    function pushHistory() {
+      historyStack.push({
+        tab: currentTab,
+        street: currentStreet,
+        building: currentBuilding,
+        residentKey: currentResidentKey
+      });
+    }
+
+    function goBack() {
+      const prev = historyStack.pop();
+      if (!prev) {
+        currentStreet = null;
+        currentBuilding = null;
+        currentResidentKey = null;
+        showTab("dashboard");
+        return;
+      }
+      currentStreet = prev.street;
+      currentBuilding = prev.building;
+      currentResidentKey = prev.residentKey;
+      showTab(prev.tab || "dashboard");
+    }
+
+    function resetResidentsView() {
+      currentStreet = null;
+      currentBuilding = null;
+      currentResidentKey = null;
+      historyStack.length = 0;
+    }
+
+    function openBuilding(street, building) {
+      pushHistory();
+      currentStreet = street;
+      currentBuilding = building;
+      currentResidentKey = null;
+      showTab("residents");
+    }
+
+    function openResident(key) {
+      pushHistory();
+      currentResidentKey = key;
+      showTab("detail");
+    }
+
+    function applyFilter(item) {
+      if (currentFilter === "signed") return hasSignature(item);
+      if (currentFilter === "missingPhone") return !item.phone;
+      if (currentFilter === "opponents") {
+        const txt = `${item.interest || ""} ${item.notes || ""}`;
+        return txt.includes("מתנגד") || txt.includes("לא מעונ");
+      }
+      return true;
+    }
+
+    function setFilter(filter, ev) {
+      currentFilter = filter;
+      document.querySelectorAll(".chip").forEach(ch => ch.classList.remove("active"));
+      if (ev && ev.currentTarget) ev.currentTarget.classList.add("active");
+      renderResidentsTab();
+    }
+
+    function renderResidentsTab() {
+      const box = document.getElementById("residentsContainer");
+      const breadcrumb = document.getElementById("breadcrumb");
+      const q = (document.getElementById("searchInput")?.value || "").trim();
+
+      if (!currentStreet && !currentBuilding) {
+        breadcrumb.textContent = "רחוב → בניין → דייר";
+        const buildings = getBuildingStats();
+        const streets = ["ניקנור","חננאל"];
+        box.innerHTML = streets.map(street => {
+          const rows = buildings.filter(b => b.street === street);
+          return `
+            <div class="street-wrap">
+              <div class="street-title">${street}</div>
+              <div class="building-grid">
+                ${rows.map(b => `
+                  <div class="card building" onclick="openBuilding('${escapeJs(street)}','${escapeJs(b.building)}')">
+                    <div class="building-top">
+                      <div class="building-name">בניין ${b.building}</div>
+                      <span class="status-dot ${buildingDotClass(b)}"></span>
+                    </div>
+                    <div class="meta">${b.pct}% חתימה · ${b.signedCount} מתוך ${b.total}</div>
+                    <div class="bar"><span style="width:${b.pct}%"></span></div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          `;
+        }).join("");
+        return;
+      }
+
+      let rows = apartments.slice();
+      if (currentStreet) rows = rows.filter(r => (r.source || "") === currentStreet);
+      if (currentBuilding) rows = rows.filter(r => String(r.building || "") === String(currentBuilding));
+      rows = rows.filter(applyFilter);
+
+      if (q) {
+        rows = rows.filter(r => {
+          const hay = [r.owner, r.phone, r.building, r.floor, r.unit, r.notes, r.source].join(" ");
+          return hay.includes(q);
+        });
+      }
+
+      breadcrumb.textContent = `${currentStreet} → בניין ${currentBuilding} → דיירים`;
+
+      if (!rows.length) {
+        box.innerHTML = `<div class="card"><div class="meta">לא נמצאו רשומות מתאימות.</div></div>`;
+        return;
+      }
+
+      box.innerHTML = rows.map(r => {
+        const key = residentKey(r);
+        return `
+          <div class="card resident-card" onclick="openResident('${escapeJs(key)}')">
+            <div class="row-top">
+              <div>
+                <div class="owner">${r.owner || "ללא שם"}</div>
+                <div class="meta">${r.source} · בניין ${r.building || "-"} · קומה ${r.floor || "-"} · דירה פנימית ${r.unit || "-"}</div>
+              </div>
+              <span class="tag ${hasSignature(r) ? "ok" : "warn"}">${hasSignature(r) ? "חתום" : "לא חתום"}</span>
+            </div>
+            <div class="meta" style="margin-top:8px;"><strong>טלפון:</strong> ${r.phone || "לא קיים"}</div>
+            <div class="note"><strong>הערה:</strong> ${r.notes || "אין הערה"}</div>
+            <div class="row-actions">
+              ${r.phone ? `<a class="btn primary" href="tel:${String(r.phone).replace(/[^\d+]/g,'')}" onclick="event.stopPropagation()">חיוג</a>` : `<button class="btn primary" disabled>אין טלפון</button>`}
+              <button class="btn secondary" onclick="event.stopPropagation(); openResident('${escapeJs(key)}')">כרטיס מלא</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderDetailTab() {
+      const box = document.getElementById("detailContainer");
+      const item = apartments.find(r => residentKey(r) === currentResidentKey);
+
+      if (!item) {
+        box.innerHTML = `<div class="card"><div class="meta">לא נמצא דייר.</div></div>`;
+        return;
+      }
+
+      box.innerHTML = `
+        <div class="card">
+          <div class="row-top">
+            <div>
+              <div class="owner" style="font-size:22px;">${item.owner || "ללא שם"}</div>
+              <div class="meta">${item.source} → בניין ${item.building || "-"} → קומה ${item.floor || "-"} → דירה פנימית ${item.unit || "-"}</div>
+            </div>
+            <span class="tag ${hasSignature(item) ? "ok" : "warn"}">${hasSignature(item) ? "חתום" : "לא חתום"}</span>
+          </div>
+
+          <div class="detail-grid">
+            <div class="card">
+              <div class="small">טלפון</div>
+              <div class="owner">${item.phone || "לא קיים"}</div>
+            </div>
+            <div class="card">
+              <div class="small">רחוב / בניין</div>
+              <div class="owner">${item.source} ${item.building || "-"}</div>
+            </div>
+            <div class="card">
+              <div class="small">קומה</div>
+              <div class="owner">${item.floor || "-"}</div>
+            </div>
+            <div class="card">
+              <div class="small">דירה פנימית</div>
+              <div class="owner">${item.unit || "-"}</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:12px;">
+            <div class="small">הערות</div>
+            <div class="note">${item.notes || "אין הערות"}</div>
+          </div>
+
+          <div class="row-actions">
+            ${item.phone ? `<a class="btn primary" href="tel:${String(item.phone).replace(/[^\d+]/g,'')}">חיוג מהיר</a>` : `<button class="btn primary" disabled>אין טלפון</button>`}
+            <button class="btn ghost" onclick="goBack()">חזרה</button>
+          </div>
+        </div>
+      `;
+    }
+
     function rerenderAll() {
-      renderKPIs();
+      fillKPIs();
       renderBuildings();
+      if (currentTab === "residents") renderResidentsTab();
+      if (currentTab === "detail") renderDetailTab();
+      if (currentTab === "insights") renderInsights();
     }
 
     async function loadData() {
@@ -411,9 +821,7 @@
           redirect: "follow"
         });
 
-        if (!res.ok) {
-          throw new Error("HTTP " + res.status);
-        }
+        if (!res.ok) throw new Error("HTTP " + res.status);
 
         const payload = await res.json();
 
